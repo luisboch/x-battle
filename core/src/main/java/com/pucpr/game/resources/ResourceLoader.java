@@ -41,6 +41,7 @@ public class ResourceLoader {
         // Player sprites
         resources.get("sprites").add("data/image/basic.png");
         resources.get("sprites").add("data/image/nave.png");
+        resources.get("sprites").add("data/image/nave2.png");
     }
     
     public static synchronized ResourceLoader getInstance(){

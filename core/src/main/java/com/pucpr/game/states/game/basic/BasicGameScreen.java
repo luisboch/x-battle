@@ -18,8 +18,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Affine2;
-import com.badlogic.gdx.math.MathUtils;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -32,6 +31,7 @@ import com.pucpr.game.server.LocalhostService;
 import com.pucpr.game.states.GameScreenState;
 import com.pucpr.game.states.game.GameState;
 import com.pucpr.game.states.game.Player;
+import com.pucpr.game.states.game.Player2;
 import com.pucpr.game.states.game.engine.ActorObject;
 import com.pucpr.game.states.game.engine.World;
 import com.pucpr.game.states.game.engine.steering.Arrive;
@@ -67,7 +67,7 @@ public class BasicGameScreen implements GameScreenState {
     protected MapRenderer render;
     protected Vector3 mousePos = new Vector3();
     protected Player player = new Player(0.5f, 700f);
-    protected Player player2 = new Player();
+    protected Player2 player2 = new Player2();
 
     public BasicGameScreen(final String mapFile) {
         map = new TmxMapLoader().load("data/maps/" + mapFile);
