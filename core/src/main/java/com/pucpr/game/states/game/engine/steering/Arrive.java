@@ -54,7 +54,6 @@ public class Arrive extends Steering<Arrive> {
 
         float speed = dist / deceleration;
         speed = Math.min(from.getMaxVel(), speed);
-        System.out.println("Dist:" +dist+", Speed: "+speed);
         
         Vector2 desired = toTarget.scl(speed).scl(1.0f / dist);
         desired.sub(from.getVelocity());

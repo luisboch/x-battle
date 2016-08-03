@@ -48,6 +48,9 @@ public class AppManager extends ApplicationAdapter {
     }
 
     public final void setState(AppState state) {
+        if (this.state != null) {
+            this.state.close();
+        }
         this.state = state;
         if (state != null) {
             state.setManager(this);

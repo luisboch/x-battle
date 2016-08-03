@@ -114,4 +114,10 @@ public class AboutState implements AppState, InputProcessor {
     public boolean scrolled(int amount) {
         return false;
     }
+
+    @Override
+    public void close() {
+    }
+    
+    
 }

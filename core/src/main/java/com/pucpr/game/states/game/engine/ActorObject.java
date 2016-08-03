@@ -66,9 +66,7 @@ public abstract class ActorObject {
         // Divide by mass
         aux.scl(1f / mass);
         Vector2 added = velocity.add(aux);
-        System.out.println("added: " + added);
         added.limit(maxVel);
-        System.out.println("limited: " + added);
 
         if (!velocity.isZero()) {
             final Vector2 velCpy = velocity.cpy().scl(secs);

@@ -118,10 +118,16 @@ public class GameState implements AppState {
         screen.setGameState(this);
         screen.setStage(stage);
         screen.create();
-        
-        
+
         nextGameScreen = null;
 
+    }
+
+    @Override
+    public void close() {
+        if (screen != null) {
+            screen.close();
+        }
     }
 
 }

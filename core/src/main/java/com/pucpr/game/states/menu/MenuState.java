@@ -90,7 +90,7 @@ public class MenuState implements AppState {
                         ac.getAction().run();
                     }
                 }
-                
+
             });
         }
 
@@ -110,6 +110,11 @@ public class MenuState implements AppState {
     @Override
     public void setManager(AppManager manager) {
         this.manager = manager;
+    }
+
+    @Override
+    public void close() {
+        Gdx.input.setInputProcessor(null);
     }
 
 }

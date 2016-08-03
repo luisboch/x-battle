@@ -18,4 +18,6 @@ public interface AppState {
     void setManager(AppManager s);
 
     void create();
+    
+    void close();
 }

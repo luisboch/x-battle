@@ -12,7 +12,7 @@ import com.pucpr.game.states.game.engine.ActorObject;
  * @email luis.c.boch@gmail.com
  * @since Jul 31, 2016
  */
-public class Seek extends Steering {
+public class Seek extends Steering<Seek> {
 
     private Vector2 target;
 

@@ -38,6 +38,7 @@ import com.pucpr.game.states.game.engine.steering.Arrive;
 import com.pucpr.game.states.game.engine.steering.Flee;
 import com.pucpr.game.states.game.engine.steering.Pursuit;
 import com.pucpr.game.states.game.engine.steering.Seek;
+import com.pucpr.game.states.game.engine.steering.Wander;
 import com.pucpr.game.states.game.engine.steering.WeightSteeringStrategy;
 
 /**
@@ -68,6 +69,7 @@ public class BasicGameScreen implements GameScreenState {
     protected Vector3 mousePos = new Vector3();
     protected Player player = new Player(0.5f, 700f);
     protected Player2 player2 = new Player2();
+    protected Player2 player3 = new Player2();
 
     public BasicGameScreen(final String mapFile) {
         map = new TmxMapLoader().load("data/maps/" + mapFile);
@@ -94,11 +96,15 @@ public class BasicGameScreen implements GameScreenState {
 
         service.insert(player);
         service.insert(player2);
+//        service.insert(player3);
+        
         player2.setPosition(new Vector2(Gdx.graphics.getWidth() / 2, 140));
 
         service.setMainActor(player);
 
         player2.setSteering(new Pursuit(player));
+        player3.setSteering(new Wander());
+        
 
     }
 

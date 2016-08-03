@@ -105,4 +105,9 @@ public class StartupState implements AppState, ResourceLoader.Handler {
             tasks.add(r);
         }
     }
+
+    @Override
+    public void close() {
+    }
+    
 }

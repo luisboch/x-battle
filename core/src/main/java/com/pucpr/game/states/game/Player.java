@@ -4,6 +4,7 @@
 package com.pucpr.game.states.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -29,6 +30,7 @@ public class Player extends ActorObject {
         super(15, 1f, 500, 50, 50);
         loadAnnimation();
     }
+
     public Player(final float mass, final float maxVel) {
         super(15, mass, maxVel, 50, 50);
         loadAnnimation();
@@ -52,6 +54,9 @@ public class Player extends ActorObject {
     @Override
     public TextureRegion getTexture() {
         stateTime += Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            return animation.get(State.RUNNING).getKeyFrame(stateTime);
+        }
         return animation.get(state).getKeyFrame(stateTime);
     }
 
