@@ -61,7 +61,7 @@ public abstract class ActorObject {
         float secs = Gdx.app.getGraphics().getDeltaTime();
 
         final Vector2 aux = steering != null ? steering.calculate() : new Vector2();
-        aux.scl(secs).limit2(maxForce);
+        aux.scl(secs).limit(maxForce);
 
         // Divide by mass
         aux.scl(1f / mass);
