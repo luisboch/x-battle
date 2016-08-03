@@ -17,7 +17,7 @@ import com.pucpr.game.states.game.engine.steering.Steering;
 public abstract class ActorObject {
 
     private long uID;
-    private final float radious;
+    private final float radius;
     private final float mass;
     private final float maxVel;
     private final float maxForce;
@@ -30,8 +30,8 @@ public abstract class ActorObject {
 
     private Steering steering;
 
-    public ActorObject(float radious, float mass, float width, float height) {
-        this.radious = radious;
+    public ActorObject(float radius, float mass, float width, float height) {
+        this.radius = radius;
         this.mass = mass;
         type = _getType();
         maxVel = 500f;
@@ -39,8 +39,8 @@ public abstract class ActorObject {
         size = new Vector2(width, height);
     }
 
-    public ActorObject(float radious, float mass, float maxVel, float width, float height) {
-        this.radious = radious;
+    public ActorObject(float radius, float mass, float maxVel, float width, float height) {
+        this.radius = radius;
         this.mass = mass;
         this.type = _getType();
         this.maxVel = maxVel;
@@ -48,8 +48,8 @@ public abstract class ActorObject {
         this.size = new Vector2(width, height);
     }
 
-    public ActorObject(float radious, float mass, float maxVel, float maxForce, float width, float height) {
-        this.radious = radious;
+    public ActorObject(float radius, float mass, float maxVel, float maxForce, float width, float height) {
+        this.radius = radius;
         this.mass = mass;
         this.type = _getType();
         this.maxVel = maxVel;
@@ -93,8 +93,8 @@ public abstract class ActorObject {
         return type;
     }
 
-    public float getRadious() {
-        return radious;
+    public float getRadius() {
+        return radius;
     }
 
     public float getMass() {
