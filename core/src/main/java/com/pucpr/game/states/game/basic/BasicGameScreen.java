@@ -2,7 +2,6 @@ package com.pucpr.game.states.game.basic;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -10,11 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapRenderer;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -30,16 +25,16 @@ import com.pucpr.game.server.GameService;
 import com.pucpr.game.server.LocalhostService;
 import com.pucpr.game.states.GameScreenState;
 import com.pucpr.game.states.game.GameState;
+import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
 import com.pucpr.game.states.game.Player2;
 import com.pucpr.game.states.game.engine.ActorObject;
-import com.pucpr.game.states.game.engine.World;
 import com.pucpr.game.states.game.engine.steering.Arrive;
 import com.pucpr.game.states.game.engine.steering.Flee;
 import com.pucpr.game.states.game.engine.steering.Pursuit;
-import com.pucpr.game.states.game.engine.steering.Seek;
 import com.pucpr.game.states.game.engine.steering.Wander;
 import com.pucpr.game.states.game.engine.steering.WeightSteeringStrategy;
+import java.util.Vector;
 
 /**
  *
@@ -70,6 +65,7 @@ public class BasicGameScreen implements GameScreenState {
     protected Player player = new Player(0.5f, 700f);
     protected Player2 player2 = new Player2();
     protected Player2 player3 = new Player2();
+    protected Planet planet = new Planet();
 
     public BasicGameScreen(final String mapFile) {
         map = new TmxMapLoader().load("data/maps/" + mapFile);
@@ -80,7 +76,7 @@ public class BasicGameScreen implements GameScreenState {
         camera = new OrthographicCamera(Gdx.graphics.getWidth() / GameConfig.PPM, Gdx.graphics.getHeight() / GameConfig.PPM);
 
         camera.position.x = 0;
-        camera.position.y = 100;
+        camera.position.y = 0;
 
         render = new OrthogonalTiledMapRenderer(map, 1f / GameConfig.PPM);
         // next we setup the immediate mode renderer
@@ -96,13 +92,17 @@ public class BasicGameScreen implements GameScreenState {
 
         service.insert(player);
         service.insert(player2);
+        service.insert(planet);
+        service.insertPlanet(planet);
 //        service.insert(player3);
         
         player2.setPosition(new Vector2(Gdx.graphics.getWidth() / 2, 140));
+        
+        planet.setPosition(new Vector2(- Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2));
 
         service.setMainActor(player);
 
-        player2.setSteering(new Pursuit(player));
+//        player2.setSteering(new Pursuit(player));
         player3.setSteering(new Wander());
         
 
@@ -163,6 +163,7 @@ public class BasicGameScreen implements GameScreenState {
                 final Sprite sprite = new Sprite(texture);
                 sprite.setPosition(position.x - (sprite.getWidth() / 2), position.y - (sprite.getHeight() / 2));
                 sprite.setRotation(angle);
+                sprite.setScale(obj.getSize().x / sprite.getWidth(), obj.getSize().y / sprite.getHeight());
 
                 sprite.draw(batch);
             }

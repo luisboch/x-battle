@@ -19,6 +19,7 @@ public abstract class GameService {
         getVisibleActors().add(actor);
     }
     
+    public abstract void insertPlanet(ActorObject actor);
     public void remove(ActorObject actor){
         getVisibleActors().remove(actor);
     }

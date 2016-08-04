@@ -3,6 +3,7 @@
  */
 package com.pucpr.game.states.game.engine;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.List;
 public class World {
 
     private List<ActorObject> actors = new ArrayList<ActorObject>();
+    private List<ActorObject> planets = new ArrayList<ActorObject>();
 
     private final float width;
     private final float height;
@@ -37,6 +39,11 @@ public class World {
 
     public World add(ActorObject actor) {
         actors.add(actor);
+        return this;
+    }
+
+    public World addPlanet(ActorObject planet) {
+        planets.add(planet);
         return this;
     }
 
@@ -64,9 +71,51 @@ public class World {
     }
 
     public void calculate() {
+        float secs = Gdx.app.getGraphics().getDeltaTime();
         for (ActorObject obj : actors) {
-            obj.calculate();
+
+            final Vector2 aux = calculateSteering(obj);
+            final Vector2 forces = calculateForceInfluence(obj);
+            aux.add(forces).scl(secs).limit(obj.getMaxForce());
+            // Divide by mass
+            aux.scl(1f / obj.getMass());
+            obj.setVelocity(obj.getVelocity().add(aux).limit(obj.getMaxVel()));
+
+            if (!obj.getVelocity().isZero()) {
+                final Vector2 velCpy = obj.getVelocity().cpy().scl(secs);
+
+                obj.setPosition(obj.getPosition().add(velCpy));
+                obj.setDirection(velCpy.nor());
+            }
         }
+
+    }
+
+    private Vector2 calculateSteering(ActorObject obj) {
+        return obj.getSteering() != null ? obj.getSteering().calculate() : new Vector2();
+    }
+
+    private Vector2 calculateForceInfluence(ActorObject objA) {
+        final Vector2 result = new Vector2();
+
+        if (planets.contains(objA)) {
+            return result;
+        }
+
+        for (ActorObject pln : planets) {
+
+            final float intensity = objA.getMass() * pln.getMass();
+            final Vector2 forceField = objA.getPosition().cpy().sub(pln.getPosition());
+            final float dist = forceField.len();
+
+            final float distSqr = dist * dist;
+
+            forceField.nor();
+            forceField.scl(intensity / distSqr);
+            result.sub(forceField);
+        }
+        System.out.println("Gravity" + result);
+        return result;
 
     }
 

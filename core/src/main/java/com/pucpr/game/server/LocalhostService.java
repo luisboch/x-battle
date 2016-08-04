@@ -46,6 +46,11 @@ public class LocalhostService extends GameService {
     }
 
     @Override
+    public void insertPlanet(ActorObject actor) {
+        world.addPlanet(actor);
+    }
+
+    @Override
     public void remove(ActorObject actor) {
         world.getActors().remove(actor);
     }

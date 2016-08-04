@@ -57,26 +57,6 @@ public abstract class ActorObject {
         this.size = new Vector2(width, height);
     }
 
-    protected void calculate() {
-        float secs = Gdx.app.getGraphics().getDeltaTime();
-
-        final Vector2 aux = steering != null ? steering.calculate() : new Vector2();
-        aux.scl(secs).limit(maxForce);
-
-        // Divide by mass
-        aux.scl(1f / mass);
-        Vector2 added = velocity.add(aux);
-        added.limit(maxVel);
-
-        if (!velocity.isZero()) {
-            final Vector2 velCpy = velocity.cpy().scl(secs);
-
-            position.add(velCpy);
-            direction = velCpy.nor();
-        }
-
-    }
-
     public long getuID() {
         return uID;
     }
@@ -110,12 +90,25 @@ public abstract class ActorObject {
         return this;
     }
 
+    public ActorObject setDirection(Vector2 pos) {
+        direction.set(pos);
+        return this;
+    }
+    public ActorObject setVelocity(Vector2 pos) {
+        velocity.set(pos);
+        return this;
+    }
+
     public Vector2 getVelocity() {
         return velocity.cpy();
     }
 
     public float getMaxVel() {
         return maxVel;
+    }
+
+    public float getMaxForce() {
+        return maxForce;
     }
 
     public Vector2 getDirection() {

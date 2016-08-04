@@ -33,5 +33,5 @@ public abstract class Steering<E extends Steering> {
         return _calculate();
     }
 
-    public abstract Vector2 _calculate();
+    protected abstract Vector2 _calculate();
 }
