@@ -71,36 +71,8 @@ public class World {
     }
 
     public void calculate() {
-       
-//        
-//        x = 50;
-//        
-//        Velocidade por segundo = 50;
-//        Força ganha 10;
-//        
-//        Velocidade por segundo 60;
-//        
-//        1 quadro por segundo;
-//        
-//        
-//        Velocidade por segundo = 50;
-//        Força ganha 10;
-//        10 quebra pelo loop  = 0.1;
-//        
-//        Ganho de velocidade neste loop = 0.1;
-//        
-//        Velocidade que eu já tenho + Ganho de velocidade neste loop 
-//        
-//        Velocidade por segundo = 50.1;
-//        
-//        Posição do objeto = 50 + 0.501;
-//        
-//        Posição do objeto = 5.501;
-//        
-//        
-//        
-//                
-                
+
+        
         float secs = Gdx.app.getGraphics().getDeltaTime();
         for (ActorObject obj : actors) {
 
@@ -109,9 +81,13 @@ public class World {
              *  1 Sterring;
              *  2 Gravidade;
              *  3 Outras forças quaisquer (vendo, magnetismo, etc);
-             * 
+             * Depois multiplica a soma das forças pelo tempo gasto no loop (secs)
+             * e limita pela força máxima do objeto (questionável).
+             * Aplica a variação da massa (força divida pela massa).
+             * Seta velocidade no objeto, considerando a soma da força.
+             * Move o objeto, de acordo com a velocidade atual (já com a força 
+             * aplicada) multiplicado pelo tempo gasto no loop (secs).
              */
-            
             final Vector2 aux = calculateSteering(obj);
             final Vector2 forces = calculateForceInfluence(obj);
             aux.add(forces).scl(secs).limit(obj.getMaxForce());
