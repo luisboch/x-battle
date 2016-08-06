@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
-import com.sun.javafx.scene.traversal.Direction;
 import java.util.HashMap;
 import java.util.Map;
 

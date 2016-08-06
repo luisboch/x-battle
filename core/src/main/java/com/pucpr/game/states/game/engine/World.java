@@ -71,9 +71,47 @@ public class World {
     }
 
     public void calculate() {
+       
+//        
+//        x = 50;
+//        
+//        Velocidade por segundo = 50;
+//        Força ganha 10;
+//        
+//        Velocidade por segundo 60;
+//        
+//        1 quadro por segundo;
+//        
+//        
+//        Velocidade por segundo = 50;
+//        Força ganha 10;
+//        10 quebra pelo loop  = 0.1;
+//        
+//        Ganho de velocidade neste loop = 0.1;
+//        
+//        Velocidade que eu já tenho + Ganho de velocidade neste loop 
+//        
+//        Velocidade por segundo = 50.1;
+//        
+//        Posição do objeto = 50 + 0.501;
+//        
+//        Posição do objeto = 5.501;
+//        
+//        
+//        
+//                
+                
         float secs = Gdx.app.getGraphics().getDeltaTime();
         for (ActorObject obj : actors) {
 
+            /**
+             * Primeiro calcula as forças.
+             *  1 Sterring;
+             *  2 Gravidade;
+             *  3 Outras forças quaisquer (vendo, magnetismo, etc);
+             * 
+             */
+            
             final Vector2 aux = calculateSteering(obj);
             final Vector2 forces = calculateForceInfluence(obj);
             aux.add(forces).scl(secs).limit(obj.getMaxForce());
@@ -82,10 +120,10 @@ public class World {
             obj.setVelocity(obj.getVelocity().add(aux).limit(obj.getMaxVel()));
 
             if (!obj.getVelocity().isZero()) {
-                final Vector2 velCpy = obj.getVelocity().cpy().scl(secs);
+                final Vector2 velSec = obj.getVelocity().cpy().scl(secs);
 
-                obj.setPosition(obj.getPosition().add(velCpy));
-                obj.setDirection(velCpy.nor());
+                obj.setPosition(obj.getPosition().add(velSec));
+                obj.setDirection(velSec.nor());
             }
         }
 

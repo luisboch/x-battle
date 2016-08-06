@@ -16,7 +16,7 @@ public class GameConfig {
     /**
      * 50/50 
      */
-    public static final float PPM = 1;
+    public static final float PPM = 0.5f;
     public static final float GAME_SCALE = 1f;
     public static SoundManager SOUND_MANAGER;
     public static final boolean showDebug = false;

@@ -66,6 +66,7 @@ public class BasicGameScreen implements GameScreenState {
     protected Player2 player2 = new Player2();
     protected Player2 player3 = new Player2();
     protected Planet planet = new Planet();
+    protected Planet planet2 = new Planet();
 
     public BasicGameScreen(final String mapFile) {
         map = new TmxMapLoader().load("data/maps/" + mapFile);
@@ -93,17 +94,28 @@ public class BasicGameScreen implements GameScreenState {
         service.insert(player);
         service.insert(player2);
         service.insert(planet);
+        service.insert(planet2);
         service.insertPlanet(planet);
+        service.insertPlanet(planet2);
 //        service.insert(player3);
         
         player2.setPosition(new Vector2(Gdx.graphics.getWidth() / 2, 140));
         
-        planet.setPosition(new Vector2(- Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2));
+        planet.setPosition(new Vector2(100, 100));
+        planet2.setPosition(new Vector2(-100, -100));
 
         service.setMainActor(player);
 
-//        player2.setSteering(new Pursuit(player));
-        player3.setSteering(new Wander());
+
+
+        final WeightSteeringStrategy stg = new WeightSteeringStrategy();
+        
+        stg.add(new Pursuit(player), 50);
+        stg.add(new Flee(planet).panicDist(100), 100);
+        stg.add(new Flee(planet2).panicDist(100), 100);
+        
+        player2.setSteering(stg);
+//        player3.setSteering(new Wander());
         
 
     }
@@ -155,7 +167,7 @@ public class BasicGameScreen implements GameScreenState {
 
             Vector2 position = obj.getPosition(); // that's the box's center position
 
-            float angle = obj.getVelocity().angle() - 90;
+            float angle = obj.getDirection().angle() - 90;
 //            System.out.println("position: " + position + ", angle: " + angle + ", size: " + obj.getSize());
             final TextureRegion texture = obj.getTexture();
             if (texture != null) {
@@ -183,6 +195,8 @@ public class BasicGameScreen implements GameScreenState {
         }
         
         stg.add(new Flee(player2).panicDist(150), 100);
+        stg.add(new Flee(planet).panicDist(70), 100);
+        stg.add(new Flee(planet2).panicDist(70), 100);
 
         player.setSteering(stg);
     }
