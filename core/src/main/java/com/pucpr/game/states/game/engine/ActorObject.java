@@ -20,7 +20,7 @@ public abstract class ActorObject {
     private final float radius;
     private final float mass;
     private final float maxVel;
-    private final float accel = 100;
+    private final float accel = 300;
     private final float maxForce;
     private final Vector2 position = new Vector2();
     private final Vector2 velocity = new Vector2();

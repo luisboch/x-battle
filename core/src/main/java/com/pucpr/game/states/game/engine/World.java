@@ -4,9 +4,9 @@
 package com.pucpr.game.states.game.engine;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.server.ActorControl;
+import com.pucpr.game.states.game.Planet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +94,7 @@ public class World {
              * tempo gasto no loop (secs).
              */
             final Vector2 aux = calculateSteering(obj);
-            final Vector2 control = calculateControl(obj);
+            final Vector2 control = (obj.getClass().equals(Planet.class)) ? new Vector2() : calculateControl(obj);
             final Vector2 forces = calculateForceInfluence(obj);
             aux.add(control).add(forces).scl(secs).limit(obj.getMaxForce());
             // Divide by mass
@@ -103,9 +103,7 @@ public class World {
 
             if (!obj.getVelocity().isZero()) {
                 final Vector2 velSec = obj.getVelocity().cpy().scl(secs);
-
                 obj.setPosition(obj.getPosition().add(velSec));
-                obj.setDirection(velSec.nor());
             }
         }
 
@@ -157,24 +155,25 @@ public class World {
             Vector2 cal = new Vector2(0.01f, 0.01f);
             ActorControl act = controledRef.get(obj);
 
-            if (!obj.getVelocity().isZero()) {
-                cal.set(obj.getVelocity().nor());
-            }
-
-            if (act.isUp()) {
-                Vector2 scl = obj.getVelocity().setLength(obj.getAccel());
-                cal.add(scl);
+            if (!obj.getDirection().isZero() && obj.getVelocity().isZero()) {
+                cal.set(obj.getDirection().isZero() ? obj.getVelocity().nor() : obj.getDirection().nor());
             }
 
             if (act.isLeft() && !act.isRight()) {
-                obj.setVelocity(obj.getVelocity().rotate(2));
+                obj.setDirection(obj.getDirection().rotate(2).nor());
             }
 
             if (!act.isLeft() && act.isRight()) {
-                obj.setVelocity(obj.getVelocity().rotate(-2));
+                obj.setDirection(obj.getDirection().rotate(-2).nor());
             }
 
-            cal.limit(obj.getMaxVel());
+            if (act.isUp()) {
+                Vector2 scl = cal.setLength(obj.getAccel());
+                cal.add(scl);
+                cal.scl(obj.getDirection()).limit(obj.getMaxVel());
+            } else {
+                cal = new Vector2(0, 0);
+            }
 
             return cal;
         }

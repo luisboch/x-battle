@@ -30,6 +30,8 @@ import com.pucpr.game.states.game.GameState;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
 import com.pucpr.game.states.game.engine.ActorObject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -61,8 +63,7 @@ public class BasicGameScreen implements GameScreenState {
     protected Player player = new Player();
     protected ActorControl playerControl;
 
-    protected Planet planet = new Planet();
-    protected Planet planet2 = new Planet();
+    protected List<Planet> planet = new ArrayList<Planet>();
 
     public BasicGameScreen(final String mapFile) {
         map = new TmxMapLoader().load("data/maps/" + mapFile);
@@ -91,12 +92,12 @@ public class BasicGameScreen implements GameScreenState {
         }
 
         playerControl = service.insert(player);
-        service.insertPlanet(planet);
-        service.insertPlanet(planet2);
 
-        planet.setPosition(new Vector2(100, 100));
-        planet2.setPosition(new Vector2(-100, -100));
-
+        for(int i = 1; i < 50; i++){
+            Planet p = new Planet();
+            p.setPosition(new Vector2(500*i, 150*i));
+            service.insertPlanet(p);
+        }
     }
 
     @Override
@@ -145,7 +146,7 @@ public class BasicGameScreen implements GameScreenState {
 
             Vector2 position = obj.getPosition(); // that's the box's center position
 
-            float angle = obj.getDirection().angle() - 90;
+            float angle = obj.getDirection().angle();
 //            System.out.println("position: " + position + ", angle: " + angle + ", size: " + obj.getSize());
             final TextureRegion texture = obj.getTexture();
             if (texture != null) {
