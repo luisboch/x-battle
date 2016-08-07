@@ -4,6 +4,8 @@
 
 package com.pucpr.game.server;
 
+import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.server.local.UDPClientService;
 import com.pucpr.game.states.game.engine.ActorObject;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,36 +17,45 @@ import java.util.List;
  * @since Jul 31, 2016
  */
 public class RemoteSevice extends GameService{
-
-    @Override
-    public void connect() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+    private String serverPath;
+    private UDPClientService service;
+    public RemoteSevice(String serverPath) {
+        this.serverPath = serverPath;
+        
+        this.service = new UDPClientService(this);
+    }
+    
+    public ActorControl insert(ActorObject obj){
+       return service.connect(obj, serverPath);
     }
 
     @Override
-    public List<ActorObject> getVisibleActors() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<ActorObject> getVisibleActors(Vector2 center) {
+        return this.service.getActors();
     }
 
     @Override
     public List<ActorObject> getActors() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.service.getActors();
     }
-
     
-    @Override
-    public void setMainActor(ActorObject mainActor) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     @Override
     public void calculate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // Nothign to do (server only)
     }
 
     @Override
     public void insertPlanet(ActorObject actor) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // Nothign to do (server only)
     }
+
+    @Override
+    public void disconnect() {
+        service.stop();
+    }
+    
+    
     
 }

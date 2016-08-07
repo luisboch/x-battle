@@ -12,6 +12,10 @@ package com.pucpr.game.server.messages;
 public class DisconnectMessage extends Message {
 
 
+    public DisconnectMessage() {
+        super(CURRENT_PROTOCOL, new byte[0]);
+    }
+
     public DisconnectMessage(byte protocol, byte[] messageData) {
         super(protocol, messageData);
     }
@@ -29,5 +33,12 @@ public class DisconnectMessage extends Message {
     public byte[] build() {
         return new byte[]{};
     }
+
+    @Override
+    public String toString() {
+        return "DisconnectMessage{" + '}';
+    }
+    
+    
 
 }

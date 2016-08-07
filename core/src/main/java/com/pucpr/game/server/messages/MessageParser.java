@@ -11,38 +11,45 @@ import java.nio.ByteBuffer;
  * @email luis.c.boch@gmail.com
  * @since Aug 6, 2016
  */
-public class FullMessage {
+public class MessageParser {
 
     private byte protocol;
     private byte messageType;
     private byte[] messageData;
+    private byte[] fullMsg;
 
-    public FullMessage() {
+    public MessageParser() {
     }
 
-    public Message parse(byte[] fullMsg) {
+    public void setFullMsg(byte[] fullMsg) {
+        this.fullMsg = fullMsg;
+    }
+
+    public Message parse() {
 
         if (fullMsg == null || fullMsg.length == 0) {
             return null;
         }
 
-        protocol = fullMsg[0];
-        messageType = fullMsg[1];
+        int idx = 0;
+        int size = Message.bytesToInt(new byte[]{fullMsg[idx++], fullMsg[idx++],
+            fullMsg[idx++], fullMsg[idx++]});
 
-        if (fullMsg.length > 2) {
-            messageData = sub(2, 4, fullMsg);
-        }
+        if (size <= fullMsg.length) {
+            protocol = fullMsg[idx++];
+            messageType = fullMsg[idx++];
 
-        int size = Message.bytesToInt(new byte[]{
-            fullMsg[fullMsg.length - 4],
-            fullMsg[fullMsg.length - 3],
-            fullMsg[fullMsg.length - 2],
-            fullMsg[fullMsg.length - 1]});
+            if (fullMsg.length > 6) {
+                byte[] fixedMsg = new byte[size];
+                cpy(fullMsg, fixedMsg);
 
-        if (size == fullMsg.length) {
+                messageData = sub(6, 0, fixedMsg);
+            }
+
             Message message = getMessage(messageType, messageData);
             message.parse();
-            return message;
+            
+            return message.isValid() ? message : null;
         }
 
         return null;
@@ -56,21 +63,19 @@ public class FullMessage {
         messageData = message.build();
 
         byte[] result = new byte[6 + messageData.length];// Allocate protocol, type, and, at end, the lenght.;
-        result[0] = protocol;
-        result[1] = messageType;
-
-        int currentIdx = 2;
-        for (int i = 0; i < messageData.length; i++) {
-
-            result[currentIdx] = messageData[i];
-            currentIdx++;
-        }
-
         byte[] messageLength = Message.intToByte(result.length);
 
+        int idx = 0;
         for (int i = 0; i < messageLength.length; i++) {
-            result[currentIdx] = messageLength[i];
-            currentIdx++;
+            result[idx++] = messageLength[i];
+        }
+
+        result[idx++] = protocol;
+        result[idx++] = messageType;
+
+        for (int i = 0; i < messageData.length; i++) {
+
+            result[idx++] = messageData[i];
         }
 
         return result;
@@ -85,6 +90,12 @@ public class FullMessage {
         }
 
         return rs;
+    }
+
+    private void cpy(byte[] bufferFrom, byte[] bufferTo) {
+        for (int i = 0; i < bufferTo.length; i++) {
+            bufferTo[i] = bufferFrom[i];
+        }
     }
 
     private Message getMessage(byte messageType, byte[] messageData) {

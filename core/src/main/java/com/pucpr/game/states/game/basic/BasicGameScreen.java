@@ -21,20 +21,15 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.pucpr.game.AppManager;
 import com.pucpr.game.GameConfig;
 import com.pucpr.game.PlayerStatus;
+import com.pucpr.game.server.ActorControl;
 import com.pucpr.game.server.GameService;
 import com.pucpr.game.server.LocalhostService;
+import com.pucpr.game.server.RemoteSevice;
 import com.pucpr.game.states.GameScreenState;
 import com.pucpr.game.states.game.GameState;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
-import com.pucpr.game.states.game.Player2;
 import com.pucpr.game.states.game.engine.ActorObject;
-import com.pucpr.game.states.game.engine.steering.Arrive;
-import com.pucpr.game.states.game.engine.steering.Flee;
-import com.pucpr.game.states.game.engine.steering.Pursuit;
-import com.pucpr.game.states.game.engine.steering.Wander;
-import com.pucpr.game.states.game.engine.steering.WeightSteeringStrategy;
-import java.util.Vector;
 
 /**
  *
@@ -62,9 +57,10 @@ public class BasicGameScreen implements GameScreenState {
     protected TiledMap map;
     protected MapRenderer render;
     protected Vector3 mousePos = new Vector3();
-    protected Player player = new Player(0.5f, 700f);
-    protected Player2 player2 = new Player2();
-    protected Player2 player3 = new Player2();
+
+    protected Player player = new Player();
+    protected ActorControl playerControl;
+
     protected Planet planet = new Planet();
     protected Planet planet2 = new Planet();
 
@@ -88,35 +84,18 @@ public class BasicGameScreen implements GameScreenState {
         font = new BitmapFont(Gdx.files.internal("data/arial-15.fnt"), false);
         font.setColor(Color.RED);
 
-        service = new LocalhostService();
-        service.connect();
+        if (GameConfig.serverHost == null) {
+            service = new LocalhostService();
+        } else {
+            service = new RemoteSevice(GameConfig.serverHost);
+        }
 
-        service.insert(player);
-        service.insert(player2);
-        service.insert(planet);
-        service.insert(planet2);
+        playerControl = service.insert(player);
         service.insertPlanet(planet);
         service.insertPlanet(planet2);
-//        service.insert(player3);
-        
-        player2.setPosition(new Vector2(Gdx.graphics.getWidth() / 2, 140));
-        
+
         planet.setPosition(new Vector2(100, 100));
         planet2.setPosition(new Vector2(-100, -100));
-
-        service.setMainActor(player);
-
-
-
-        final WeightSteeringStrategy stg = new WeightSteeringStrategy();
-        
-        stg.add(new Pursuit(player), 50);
-        stg.add(new Flee(planet).panicDist(100), 100);
-        stg.add(new Flee(planet2).panicDist(100), 100);
-        
-        player2.setSteering(stg);
-//        player3.setSteering(new Wander());
-        
 
     }
 
@@ -130,9 +109,8 @@ public class BasicGameScreen implements GameScreenState {
         calculate();
         long start = TimeUtils.nanoTime();
 
-//        camera.position.x = player.getPosition().x;
-//        camera.position.y = player.getPosition().y;
-
+        camera.position.x = player.getPosition().x;
+        camera.position.y = player.getPosition().y;
         camera.update();
         mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         mousePos = camera.unproject(mousePos);
@@ -188,17 +166,29 @@ public class BasicGameScreen implements GameScreenState {
 
     private void calculate() {
 
-        final WeightSteeringStrategy stg = new WeightSteeringStrategy();
-//            
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            stg.add(new Arrive(new Vector2(mousePos.x, mousePos.y)), 100);
+            playerControl.setForce(true);
+        } else {
+            playerControl.setForce(false);
         }
-        
-//        stg.add(new Flee(player2).panicDist(150), 100);
-        stg.add(new Flee(planet).panicDist(70), 100);
-        stg.add(new Flee(planet2).panicDist(70), 100);
 
-        player.setSteering(stg);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
+            playerControl.setUp(true);
+        } else {
+            playerControl.setUp(false);
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
+            playerControl.setLeft(true);
+        } else {
+            playerControl.setLeft(false);
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
+            playerControl.setRight(true);
+        } else {
+            playerControl.setRight(false);
+        }
     }
 
     public void setGameState(GameState gameState) {

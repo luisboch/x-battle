@@ -3,15 +3,11 @@
  */
 package com.pucpr.game.server.messages;
 
-import com.badlogic.gdx.math.Vector2;
-import com.pucpr.game.states.game.Planet;
-import com.pucpr.game.states.game.Player;
-import com.pucpr.game.states.game.Player2;
 import com.pucpr.game.states.game.engine.ActorObject;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +21,7 @@ public class StatusMessage extends Message {
     private static final int SIZE_PER_EL = 13;
 
     private boolean valid;
+    private ActorObject currentPlayer;
 
     private final Map<ActorObject, Byte> objects = new HashMap<ActorObject, Byte>();
 
@@ -38,6 +35,14 @@ public class StatusMessage extends Message {
 
     public StatusMessage add(ActorObject obj) {
         objects.put(obj, getType(obj));
+        return this;
+    }
+
+    public StatusMessage addAll(List<ActorObject> list) {
+        for (ActorObject obj : list) {
+            objects.put(obj, getType(obj));
+        }
+
         return this;
     }
 
@@ -64,9 +69,22 @@ public class StatusMessage extends Message {
          * 11 = third angle;<br>
          * 12 = four angle;<br>
          */
-        byte[] data = new byte[objects.size() * SIZE_PER_EL]; // we will use 10 bytes for each element
+        byte[] data = new byte[objects.size() * SIZE_PER_EL + SIZE_PER_EL]; // we will use 10 bytes for each element + current player
 
         int idx = 0;
+
+        data[idx] = getType(currentPlayer);
+        idx++;
+        add(buildBytes((int) currentPlayer.getPosition().x), data, idx);
+        idx += 4;
+        add(buildBytes((int) currentPlayer.getPosition().y), data, idx);
+        idx += 4;
+        int angle = (int) currentPlayer.getDirection().angle();
+        byte[] angleBytes = buildBytes(angle);
+
+        add(angleBytes, data, idx);
+
+        idx += 4;
 
         for (ActorObject act : objects.keySet()) {
             data[idx] = objects.get(act);
@@ -119,52 +137,34 @@ public class StatusMessage extends Message {
             final ActorObject actor = getActor(type, bytesToInt(posX), bytesToInt(posY), bytesToInt(angle));
 
             if (actor != null) {
-                objects.put(actor, type);
+                if (loop == 0) { // is first element? then it is the currentplayer
+                    currentPlayer = actor;
+                } else {
+                    objects.put(actor, type);
+                }
             }
         }
-        
+
         valid = true;
 
     }
 
-    private ActorObject getActor(byte type, int posX, int posY, int angle) {
+    public StatusMessage setCurrentPlayer(ActorObject player) {
+        currentPlayer = player;
+        return this;
+    }
 
-        if (type == 1) {
-            Player object = new Player();
-            object.setPosition(new Vector2(posX, posY));
-            object.setVelocity(new Vector2().rotate(angle));
-            object.setDirection(object.getVelocity().cpy().nor());
-            return object;
-        } else if (type == 2) {
-            Player2 object = new Player2();
-            object.setPosition(new Vector2(posX, posY));
-            object.setVelocity(new Vector2().rotate(angle));
-            object.setDirection(object.getVelocity().cpy().nor());
-            return object;
-        } else if (type == 3) {
-            Planet object = new Planet();
-            object.setPosition(new Vector2(posX, posY));
-            object.setVelocity(new Vector2().rotate(angle));
-            object.setDirection(object.getVelocity().cpy().nor());
-            return object;
-        }
-
-        return null;
+    public ActorObject getCurrentPlayer() {
+        return currentPlayer;
     }
 
     public Collection<ActorObject> getObjects() {
         return objects.keySet();
     }
 
-    private byte getType(ActorObject obj) {
-
-        if (obj.getClass().equals(Player.class)) {
-            return 1;
-        } else if (obj.getClass().equals(Player2.class)) {
-            return 2;
-        } else if (obj.getClass().equals(Planet.class)) {
-            return 3;
-        }
-        return 0;
+    @Override
+    public String toString() {
+        return "StatusMessage{" + "valid=" + valid + ", currentPlayer=" + currentPlayer + ", objects=" + objects + '}';
     }
+
 }

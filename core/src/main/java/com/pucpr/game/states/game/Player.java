@@ -29,12 +29,7 @@ public class Player extends ActorObject {
         super(15, 1f, 500, 50, 50);
         loadAnnimation();
     }
-
-    public Player(final float mass, final float maxVel) {
-        super(15, mass, maxVel, 50, 50);
-        loadAnnimation();
-    }
-
+    
     private void loadAnnimation() {
         ResourceLoader loader = ResourceLoader.getInstance();
         Texture texture = loader.getTexture("data/image/nave.png");

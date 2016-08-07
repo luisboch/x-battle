@@ -6,7 +6,7 @@ package com.pucpr.game.server.local;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.server.messages.CommandMessage;
 import com.pucpr.game.server.messages.ConnectMessage;
-import com.pucpr.game.server.messages.FullMessage;
+import com.pucpr.game.server.messages.MessageParser;
 import com.pucpr.game.server.messages.StatusMessage;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
@@ -23,11 +23,12 @@ public class ProtocolTester {
 
     public static void test() {
         System.out.println("PROTOCOL TESTER: ");
-        FullMessage fullMesg = new FullMessage();
+        MessageParser fullMesg = new MessageParser();
         byte type = 3;
         byte[] connectBytes = fullMesg.build(new ConnectMessage(type));
 
-        final ConnectMessage connectMessage = (ConnectMessage) fullMesg.parse(connectBytes);
+        fullMesg.setFullMsg(connectBytes);
+        final ConnectMessage connectMessage = (ConnectMessage) fullMesg.parse();
         if (connectMessage == null || !connectMessage.isValid() || connectMessage.getType() != type) {
             throw new IllegalStateException("Connect test failed!");
         } else {
@@ -47,7 +48,8 @@ public class ProtocolTester {
 
         byte[] commandBytes = fullMesg.build(command);
 
-        CommandMessage commandMessage = (CommandMessage) fullMesg.parse(commandBytes);
+        fullMesg.setFullMsg(commandBytes);
+        CommandMessage commandMessage = (CommandMessage) fullMesg.parse();
         if (commandMessage == null || !commandMessage.isValid()
                 || commandMessage.isUP()
                 || commandMessage.isRIGHT()
@@ -68,25 +70,26 @@ public class ProtocolTester {
 
         Player p = new Player();
         p.setPosition(new Vector2(200, 100));
-        p.setDirection(new Vector2().rotate(90));
+        p.setDirection(new Vector2(54, 19).rotate(90));
 
         Player2 p2 = new Player2();
         p2.setPosition(new Vector2(100, 100));
-        p2.setDirection(new Vector2().rotate(180));
+        p2.setDirection(new Vector2(54, 19).rotate(180));
 
         Planet pl = new Planet();
         pl.setPosition(new Vector2(-200, 100));
-        pl.setDirection(new Vector2());
+        pl.setDirection(new Vector2(54, 19));
 
-        status.add(p).add(p2).add(pl);
+        status.setCurrentPlayer(p).add(p2).add(pl);
 
         byte[] statusBytes = fullMesg.build(status);
-        final StatusMessage statusMessage = (StatusMessage) fullMesg.parse(statusBytes);
+        fullMesg.setFullMsg(statusBytes);
+        final StatusMessage statusMessage = (StatusMessage) fullMesg.parse();
 
-        if (statusMessage == null || !statusMessage.isValid() || statusMessage.getObjects().size() != 3) {
+        if (statusMessage == null || !statusMessage.isValid() || statusMessage.getObjects().size() != 2) {
             throw new IllegalStateException("Status test failed!");
         } else {
-            int plInst = 0;
+            compare(status.getCurrentPlayer(), p);
             for (ActorObject obj : status.getObjects()) {
                 if (obj instanceof Player) {
                     compare(obj, p);

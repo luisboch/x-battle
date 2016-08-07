@@ -20,6 +20,7 @@ public abstract class ActorObject {
     private final float radius;
     private final float mass;
     private final float maxVel;
+    private final float accel = 100;
     private final float maxForce;
     private final Vector2 position = new Vector2();
     private final Vector2 velocity = new Vector2();
@@ -117,6 +118,10 @@ public abstract class ActorObject {
 
     public Vector2 getSize() {
         return size;
+    }
+
+    public float getAccel() {
+        return accel;
     }
 
     public void setSteering(Steering steering) {

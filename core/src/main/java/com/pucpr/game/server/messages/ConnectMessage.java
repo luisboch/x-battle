@@ -3,6 +3,8 @@
  */
 package com.pucpr.game.server.messages;
 
+import com.pucpr.game.states.game.engine.ActorObject;
+
 /**
  *
  * @author Luis Boch
@@ -14,9 +16,16 @@ public class ConnectMessage extends Message {
     private byte type;
     private boolean valid;
 
-    public ConnectMessage(byte type) {
+    public ConnectMessage() {
         super(CURRENT_PROTOCOL, new byte[0]);
+    }
+    public ConnectMessage(byte type) {
+        this();
         this.type = type;
+    }
+    public ConnectMessage(ActorObject type) {
+        this();
+        this.type = getType(type);
     }
 
     public ConnectMessage(byte protocol, byte[] messageData) {
@@ -49,5 +58,13 @@ public class ConnectMessage extends Message {
     public byte getType() {
         return type;
     }
+    
+    public ActorObject getActor(){
+        return getActor(type, 0, 0, 0);
+    }
 
+    @Override
+    public String toString() {
+        return "ConnectMessage{" + "type=" + type + ", valid=" + valid + '}';
+    }
 }

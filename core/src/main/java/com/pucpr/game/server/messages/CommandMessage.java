@@ -3,6 +3,9 @@
  */
 package com.pucpr.game.server.messages;
 
+import com.pucpr.game.server.ActorControl;
+import java.util.Arrays;
+
 /**
  *
  * @author Luis Boch
@@ -67,14 +70,28 @@ public class CommandMessage extends Message {
         super(CURRENT_PROTOCOL, new byte[0]);
     }
 
+    public CommandMessage(ActorControl ctrl) {
+        this();
+        this.command0 = ctrl.isUp() ? (byte) 1 : (byte) 0;
+        this.command1 = ctrl.isRight() ? (byte) 1 : (byte) 0;
+        this.command2 = ctrl.isDown() ? (byte) 1 : (byte) 0;
+        this.command3 = ctrl.isLeft() ? (byte) 1 : (byte) 0;
+        this.command4 = ctrl.isForce() ? (byte) 1 : (byte) 0;
+        this.command5 = ctrl.isAction1() ? (byte) 1 : (byte) 0;
+        this.command6 = ctrl.isAction2() ? (byte) 1 : (byte) 0;
+        this.command7 = ctrl.isAction3() ? (byte) 1 : (byte) 0;
+        this.mouseX = ctrl.getMouseX();
+        this.mouseY = ctrl.getMouseY();
+    }
+
     public CommandMessage(byte protocol, byte[] messageData) {
         super(protocol, messageData);
     }
 
     @Override
     public void parse() {
-        if (messageData == null || messageData.length < 8) {
-            System.out.println("CommandMessage#parse: received invalid message: " + messageData);
+        if (messageData == null || messageData.length < 10) {
+            System.out.println("CommandMessage#parse: received invalid message: " + Arrays.toString(messageData));
             valid = false;
         } else {
 
@@ -292,6 +309,14 @@ public class CommandMessage extends Message {
         }
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "CommandMessage{" + "command0=" + command0 + ", command1=" + command1 + 
+                ", command2=" + command2 + ", command3=" + command3 + ", command4=" + command4 + 
+                ", command5=" + command5 + ", command6=" + command6 + ", command7=" + command7 + 
+                ", mouseX=" + mouseX + ", mouseY=" + mouseY + ", valid=" + valid + '}';
     }
 
 }

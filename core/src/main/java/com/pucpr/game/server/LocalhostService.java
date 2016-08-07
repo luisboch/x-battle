@@ -4,6 +4,8 @@
 package com.pucpr.game.server;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.server.local.UDPServerService;
 import com.pucpr.game.states.game.engine.ActorObject;
 import com.pucpr.game.states.game.engine.World;
 import java.util.ArrayList;
@@ -18,20 +20,16 @@ import java.util.List;
 public class LocalhostService extends GameService {
 
     private World world;
-    private ActorObject localActor;
+    private UDPServerService udpService;
 
-    @Override
-    public void connect() {
+    public LocalhostService(){
         world = new World(10000, 10000);
-    }
-
-    public void setMainActor(ActorObject mainActor) {
-        this.localActor = mainActor;
+        udpService = new UDPServerService(world, this);
     }
     
     @Override
-    public List<ActorObject> getVisibleActors() {
-        return world.getVisibleActors(localActor.getPosition(), Gdx.graphics.getWidth() / 2);
+    public List<ActorObject> getVisibleActors(Vector2 center) {
+        return world.getVisibleActors(center, (float) Gdx.graphics.getWidth() / 2);
     }
 
     @Override
@@ -41,8 +39,8 @@ public class LocalhostService extends GameService {
 
     
     @Override
-    public void insert(ActorObject actor) {
-        world.add(actor);
+    public ActorControl insert(ActorObject actor) {
+        return udpService.connect(actor);
     }
 
     @Override
@@ -59,6 +57,13 @@ public class LocalhostService extends GameService {
     public void calculate() {
         world.calculate();
     }
+
+    @Override
+    public void disconnect() {
+        udpService.stop();
+    }
+    
+    
 
     
 }

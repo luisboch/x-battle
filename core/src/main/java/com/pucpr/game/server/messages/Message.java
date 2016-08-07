@@ -3,9 +3,11 @@
  */
 package com.pucpr.game.server.messages;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.states.game.Planet;
+import com.pucpr.game.states.game.Player;
+import com.pucpr.game.states.game.Player2;
+import com.pucpr.game.states.game.engine.ActorObject;
 import java.nio.ByteBuffer;
 
 /**
@@ -123,7 +125,7 @@ public abstract class Message {
     }
 
     public static int bytesToInt(byte... intBytes) {
-        
+
         byte b1 = intBytes[0];
         byte b2 = intBytes[1];
         byte b3 = intBytes[2];
@@ -133,5 +135,44 @@ public abstract class Message {
                 | ((0xFF & b3) << 8) | (0xFF & b4);
 
         return val;
+    }
+
+    protected byte getType(ActorObject obj) {
+
+        if (obj.getClass().equals(Player.class)) {
+            return 1;
+        } else if (obj.getClass().equals(Player2.class)) {
+            return 2;
+        } else if (obj.getClass().equals(Planet.class)) {
+            return 3;
+        }
+        return 0;
+    }
+
+    protected ActorObject getActor(byte type, int posX, int posY, int angle) {
+
+        if (type == 1) {
+            Player object = new Player();
+            object.setPosition(new Vector2(posX, posY));
+            Vector2 vel = new Vector2(0.0001f, 0.0001f).nor();
+            vel.rotate(angle - vel.angle());
+            object.setVelocity(vel);
+            object.setDirection(object.getVelocity().cpy().nor());
+            return object;
+        } else if (type == 2) {
+            Player2 object = new Player2();
+            object.setPosition(new Vector2(posX, posY));
+            object.setVelocity(new Vector2().rotate(angle));
+            object.setDirection(object.getVelocity().cpy().nor());
+            return object;
+        } else if (type == 3) {
+            Planet object = new Planet();
+            object.setPosition(new Vector2(posX, posY));
+            object.setVelocity(new Vector2().rotate(angle));
+            object.setDirection(object.getVelocity().cpy().nor());
+            return object;
+        }
+
+        return null;
     }
 }

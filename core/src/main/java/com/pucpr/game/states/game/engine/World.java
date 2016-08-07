@@ -6,8 +6,11 @@ package com.pucpr.game.states.game.engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.server.ActorControl;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -17,8 +20,12 @@ import java.util.List;
  */
 public class World {
 
-    private List<ActorObject> actors = new ArrayList<ActorObject>();
-    private List<ActorObject> planets = new ArrayList<ActorObject>();
+    private final List<ActorObject> actors = new ArrayList<ActorObject>();
+
+    private final Map<ActorObject, ActorControl> controledRef
+            = new HashMap<ActorObject, ActorControl>();
+
+    private final List<ActorObject> planets = new ArrayList<ActorObject>();
 
     private final float width;
     private final float height;
@@ -44,6 +51,7 @@ public class World {
 
     public World addPlanet(ActorObject planet) {
         planets.add(planet);
+        actors.add(planet);
         return this;
     }
 
@@ -51,8 +59,8 @@ public class World {
         return actors;
     }
 
-    public List<ActorObject> getVisibleActors(Vector2 center, float viewSize) {
-        if (center == null) {
+    public List<ActorObject> getVisibleActors(Vector2 center, Float viewSize) {
+        if (center == null || viewSize == null) {
             throw new IllegalArgumentException("All params are required!");
         }
 
@@ -61,7 +69,7 @@ public class World {
         final List<ActorObject> list = new ArrayList<ActorObject>();
 
         for (ActorObject obj : actors) {
-            if (obj.getPosition().dst2(center) < viewSize) {
+            if (obj.getPosition().dst(center) < viewSize) {
                 list.add(obj);
             }
         }
@@ -72,25 +80,23 @@ public class World {
 
     public void calculate() {
 
-        
         float secs = Gdx.app.getGraphics().getDeltaTime();
         for (ActorObject obj : actors) {
 
             /**
-             * Primeiro calcula as forças.
-             *  1 Sterring;
-             *  2 Gravidade;
-             *  3 Outras forças quaisquer (vendo, magnetismo, etc);
-             * Depois multiplica a soma das forças pelo tempo gasto no loop (secs)
-             * e limita pela força máxima do objeto (questionável).
-             * Aplica a variação da massa (força divida pela massa).
-             * Seta velocidade no objeto, considerando a soma da força.
-             * Move o objeto, de acordo com a velocidade atual (já com a força 
-             * aplicada) multiplicado pelo tempo gasto no loop (secs).
+             * Primeiro calcula as forças. 1 Sterring; 2 Gravidade; 3 Outras
+             * forças quaisquer (vendo, magnetismo, etc); Depois multiplica a
+             * soma das forças pelo tempo gasto no loop (secs) e limita pela
+             * força máxima do objeto (questionável). Aplica a variação da massa
+             * (força divida pela massa). Seta velocidade no objeto,
+             * considerando a soma da força. Move o objeto, de acordo com a
+             * velocidade atual (já com a força aplicada) multiplicado pelo
+             * tempo gasto no loop (secs).
              */
             final Vector2 aux = calculateSteering(obj);
+            final Vector2 control = calculateControl(obj);
             final Vector2 forces = calculateForceInfluence(obj);
-            aux.add(forces).scl(secs).limit(obj.getMaxForce());
+            aux.add(control).add(forces).scl(secs).limit(obj.getMaxForce());
             // Divide by mass
             aux.scl(1f / obj.getMass());
             obj.setVelocity(obj.getVelocity().add(aux).limit(obj.getMaxVel()));
@@ -131,6 +137,49 @@ public class World {
 
         return result;
 
+    }
+
+    public ActorControl create(ActorObject actor) {
+        ActorControl act = new ActorControl(actor);
+        add(actor);
+        actor.setVelocity(new Vector2(0.0001f, 0.0001f));
+        actor.setDirection(actor.getVelocity().nor());
+        bind(actor, act);
+        return act;
+    }
+
+    private void bind(ActorObject actor, ActorControl act) {
+        controledRef.put(actor, act);
+    }
+
+    private Vector2 calculateControl(ActorObject obj) {
+        if (controledRef.containsKey(obj)) {
+            Vector2 cal = new Vector2(0.01f, 0.01f);
+            ActorControl act = controledRef.get(obj);
+
+            if (!obj.getVelocity().isZero()) {
+                cal.set(obj.getVelocity().nor());
+            }
+
+            if (act.isUp()) {
+                Vector2 scl = obj.getVelocity().setLength(obj.getAccel());
+                cal.add(scl);
+            }
+
+            if (act.isLeft() && !act.isRight()) {
+                obj.setVelocity(obj.getVelocity().rotate(2));
+            }
+
+            if (!act.isLeft() && act.isRight()) {
+                obj.setVelocity(obj.getVelocity().rotate(-2));
+            }
+
+            cal.limit(obj.getMaxVel());
+
+            return cal;
+        }
+
+        return new Vector2();
     }
 
     public static interface ContactListener {

@@ -24,5 +24,6 @@ public class GameConfig {
     public static final boolean skipFrames = false;
     public static long waitScreenToChange = 1500;
     public static float defaultMusicVolume = 0.3f;
+    public static String serverHost = null;
 
 }
