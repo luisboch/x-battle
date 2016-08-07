@@ -32,6 +32,7 @@ public class UDPClientService {
     private final int UDP_PORT = 9998;
     private final int UDP_SERVER_PORT = 9999;
     private final long synchMs = 3;
+    private final long sendPckMs = 20;
     private final RemoteSevice service;
     private ActorControl control;
     private List<ActorObject> actors = new ArrayList<ActorObject>();
@@ -120,10 +121,12 @@ public class UDPClientService {
                 System.out.printf("Listening on udp:%s:%d%n",
                         InetAddress.getLocalHost().getHostAddress(), udpServer.getPort());
                 DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
+                byte loopQty = 0;
+                long loopAvgSum = 0;
 
                 while (!stopped) {
 
-//                    long l = System.currentTimeMillis();
+                    long mls = System.currentTimeMillis();
 
                     udpServer.receive(receivePacket);
                     lastReceivedMessage = System.currentTimeMillis();
@@ -136,8 +139,16 @@ public class UDPClientService {
                         System.out.println("Packet ignored (invalid) ");
                     }
 
-//                    System.out.println("Loop: " + (System.currentTimeMillis() - l));
-                    Thread.sleep(synchMs);
+                    loopQty++;
+                    loopAvgSum += (System.currentTimeMillis() - mls);
+
+                    if (loopQty == 10) {
+                        loopAvgSum /= loopQty;
+                        loopQty = 0;
+                        System.out.println("Loop: " + loopAvgSum);
+                        loopAvgSum = 0;
+                    }
+
                 }
             } catch (Exception ex) {
                 ex.printStackTrace(System.out);
@@ -174,6 +185,9 @@ public class UDPClientService {
                 Thread.sleep(synchMs);
 
                 while (!stopped) {
+
+                    long start = System.currentTimeMillis();
+
                     Message pool = null;
                     while ((pool = messages.peek()) != null && !stopped) {
                         byte[] sendData = messageParser.build(pool);
@@ -183,7 +197,15 @@ public class UDPClientService {
                         messages.remove(pool);
                     }
 
-                    Thread.sleep(synchMs);
+                    
+                    long synchTime = System.currentTimeMillis() - start;
+                    long waitTime = sendPckMs - synchTime;
+
+                    if (waitTime > 0) {
+
+                        System.out.println("Waiting for " + waitTime);
+                        Thread.sleep(waitTime);
+                    }
 
                     // All times add command msg
                     CommandMessage commandMessage = new CommandMessage(control);

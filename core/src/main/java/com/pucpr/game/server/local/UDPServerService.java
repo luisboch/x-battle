@@ -5,7 +5,6 @@ package com.pucpr.game.server.local;
 
 import com.pucpr.game.server.ActorControl;
 import com.pucpr.game.server.LocalhostService;
-import com.pucpr.game.server.RemoteSevice;
 import com.pucpr.game.server.messages.CommandMessage;
 import com.pucpr.game.server.messages.ConnectMessage;
 import com.pucpr.game.server.messages.DisconnectMessage;
@@ -17,14 +16,12 @@ import com.pucpr.game.states.game.engine.World;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Luis Boch
@@ -36,9 +33,10 @@ public class UDPServerService {
     private final int UDP_CLIENT_PORT = 9998;
     private final int UDP_SERVER_PORT = 9999;
     private final long synchMs = 3;
+    private final long sendPckMs = 20;
     private final LocalhostService service;
 
-    private Map<InetAddress, ClientInfo> clients = new HashMap<InetAddress, ClientInfo>();
+    private Map<InetAddress, ClientInfo> clients = new ConcurrentHashMap<InetAddress, ClientInfo>();
 
     private ActorControl control;
     private final World world;
@@ -145,7 +143,6 @@ public class UDPServerService {
                     }
 
                     Thread.sleep(synchMs);
-
                 }
             } catch (Exception ex) {
                 ex.printStackTrace(System.out);
@@ -224,12 +221,6 @@ public class UDPServerService {
                         messages.remove(pool);
                     }
 
-                    long timeProcessing = System.currentTimeMillis() - startLoop;
-
-                    if (timeProcessing < synchMs) { // Ensure that we wait 50ms on loop (when it reaches ignore stop)
-                        Thread.sleep(synchMs - timeProcessing);
-                    }
-
                     // All times add status msg
                     for (ClientInfo c : clients.values()) {
                         final StatusMessage msg = new StatusMessage();
@@ -237,6 +228,14 @@ public class UDPServerService {
                         msg.addAll(objs);
                         msg.setCurrentPlayer(c.object.getActor());
                         messages.offer(new ClientMesg(c.addr, msg));
+                    }
+
+                    long timeProcessing = System.currentTimeMillis() - startLoop;
+
+                    if (timeProcessing < sendPckMs) { // Ensure that we wait 50ms on loop (when it reaches ignore stop)
+                        long wait = sendPckMs - timeProcessing;
+                        System.out.println("Waiting for " + wait);
+                        Thread.sleep(wait);
                     }
                 }
             } catch (Exception ex) {
