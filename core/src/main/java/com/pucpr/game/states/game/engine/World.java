@@ -128,7 +128,7 @@ public class World {
             forceField.scl(intensity / distSqr);
             result.sub(forceField);
         }
-        System.out.println("Gravity" + result);
+
         return result;
 
     }

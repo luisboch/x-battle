@@ -18,7 +18,7 @@ import java.util.List;
 public class LocalhostService extends GameService {
 
     private World world;
-    private ActorObject mainActor;
+    private ActorObject localActor;
 
     @Override
     public void connect() {
@@ -26,12 +26,12 @@ public class LocalhostService extends GameService {
     }
 
     public void setMainActor(ActorObject mainActor) {
-        this.mainActor = mainActor;
+        this.localActor = mainActor;
     }
-
+    
     @Override
     public List<ActorObject> getVisibleActors() {
-        return world.getVisibleActors(mainActor.getPosition(), Gdx.graphics.getWidth() / 2);
+        return world.getVisibleActors(localActor.getPosition(), Gdx.graphics.getWidth() / 2);
     }
 
     @Override

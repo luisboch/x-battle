@@ -15,7 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.pucpr.game.AppManager;
-import com.pucpr.game.GameConfig;
+import com.pucpr.game.resources.ResourceLoader;
+import com.pucpr.game.server.local.ProtocolTester;
 import com.pucpr.game.states.game.GameState;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,9 @@ public class MenuState implements AppState {
     private Table container;
 
     public void create() {
+
+        // Validate network protocol
+        ProtocolTester.test();
 
         final Action start = new Action("Start", 0);
         start.setAction(new Runnable() {

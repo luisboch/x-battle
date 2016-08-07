@@ -129,7 +129,7 @@ public class BasicGameScreen implements GameScreenState {
     public void render() {
         calculate();
         long start = TimeUtils.nanoTime();
-//
+
 //        camera.position.x = player.getPosition().x;
 //        camera.position.y = player.getPosition().y;
 
@@ -194,7 +194,7 @@ public class BasicGameScreen implements GameScreenState {
             stg.add(new Arrive(new Vector2(mousePos.x, mousePos.y)), 100);
         }
         
-        stg.add(new Flee(player2).panicDist(150), 100);
+//        stg.add(new Flee(player2).panicDist(150), 100);
         stg.add(new Flee(planet).panicDist(70), 100);
         stg.add(new Flee(planet2).panicDist(70), 100);
 
