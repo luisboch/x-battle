@@ -84,18 +84,32 @@ public class World {
         for (ActorObject obj : actors) {
 
             /**
-             * Primeiro calcula as forças. 1 Sterring; 2 Gravidade; 3 Outras
-             * forças quaisquer (vendo, magnetismo, etc); Depois multiplica a
-             * soma das forças pelo tempo gasto no loop (secs) e limita pela
-             * força máxima do objeto (questionável). Aplica a variação da massa
-             * (força divida pela massa). Seta velocidade no objeto,
-             * considerando a soma da força. Move o objeto, de acordo com a
-             * velocidade atual (já com a força aplicada) multiplicado pelo
-             * tempo gasto no loop (secs).
+             * Primeiro calcula as forças.<br>
+             * <ul>
+             * <li>1 Sterring; </li>
+             * <li>2 Gravidade; </li>
+             * <li>3 Outras forças quaisquer (vendo, magnetismo, etc); </li>
+             * </ul>
+             * Depois multiplica a soma das forças pelo tempo gasto no loop
+             * (secs) e limita pela força máxima do objeto (questionável). <br>
+             * Aplica a variação da massa (força divida pela massa). <br>
+             * Seta velocidade no objeto, considerando a soma da força.<br>
+             * Move o objeto, de acordo com a velocidade atual (já com a força
+             * aplicada) multiplicado pelo tempo gasto no loop (secs).
              */
             final Vector2 aux = calculateSteering(obj);
-            final Vector2 control = (obj.getClass().equals(Planet.class)) ? new Vector2() : calculateControl(obj);
-            final Vector2 forces = calculateForceInfluence(obj);
+
+            final Vector2 control;
+            final Vector2 forces;
+
+            if (!obj.getClass().equals(Planet.class)) {
+                control = calculateControl(obj);
+                forces = calculateForceInfluence(obj);
+            } else {
+                control = new Vector2();
+                forces = new Vector2();
+            }
+
             aux.add(control).add(forces).scl(secs).limit(obj.getMaxForce());
             // Divide by mass
             aux.scl(1f / obj.getMass());
@@ -122,9 +136,14 @@ public class World {
 
         for (ActorObject pln : planets) {
 
-            final float intensity = objA.getMass() * pln.getMass();
             final Vector2 forceField = objA.getPosition().cpy().sub(pln.getPosition());
             final float dist = forceField.len();
+            
+            if (dist > 300) {
+                continue; // Ignore objects that is too far away.
+            }
+            
+            final float intensity = objA.getMass() * pln.getMass();
 
             final float distSqr = dist * dist;
 
