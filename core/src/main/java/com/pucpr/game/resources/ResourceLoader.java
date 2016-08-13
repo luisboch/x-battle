@@ -19,6 +19,7 @@ import java.util.Map;
  * @author luis
  */
 public class ResourceLoader {
+
     private static ResourceLoader _instance;
 
     private final Map<String, List<String>> resources = new HashMap();
@@ -32,6 +33,7 @@ public class ResourceLoader {
     final Map<String, FileHandle> loadedResources = new HashMap();
     final Map<String, Sound> loadedAudios = new HashMap();
     final Map<String, Texture> loadedTextures = new HashMap();
+
     private ResourceLoader() {
         resources.put("skin", new ArrayList());
         resources.get("skin").add("data/uiskin.json");
@@ -39,19 +41,21 @@ public class ResourceLoader {
         resources.put("sprites", new ArrayList<String>());
 
         // Player sprites
-        resources.get("sprites").add("data/image/basic.png");
-        resources.get("sprites").add("data/image/nave.png");
-        resources.get("sprites").add("data/image/nave2.png");
+        resources.get("sprites").add("data/image/ships/F-22B.png");
+        resources.get("sprites").add("data/image/ships/SR-91A.png");
+        resources.get("sprites").add("data/image/ships/Su-51K in.png");
+        resources.get("sprites").add("data/image/disasteroids/fire.png");
+        resources.get("sprites").add("data/image/explosions/explosion1.png");
     }
-    
-    public static synchronized ResourceLoader getInstance(){
-        if(_instance == null){
+
+    public static synchronized ResourceLoader getInstance() {
+        if (_instance == null) {
             _instance = new ResourceLoader();
         }
-        
+
         return _instance;
     }
-    
+
     public void load() {
         Thread t = new Thread() {
             @Override
@@ -169,8 +173,9 @@ public class ResourceLoader {
 
     /**
      * Return new audio based on resource key.
+     *
      * @param key
-     * @return 
+     * @return
      */
     public Sound getMusic(String key) {
         return Gdx.audio.newSound(loadedResources.get(key));
@@ -181,6 +186,13 @@ public class ResourceLoader {
     }
 
     public Texture getTexture(String key) {
+
+        if (!loadedTextures.containsKey(key)) {
+            loadedTextures.put(key, new Texture(Gdx.files.internal(key)));
+            System.out.println("X-BATTLE WARN: Loading not loaded texture... "
+                    + "please add this texture to loader, to improve game performance!");
+        }
+
         return loadedTextures.get(key);
     }
 }

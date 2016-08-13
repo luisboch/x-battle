@@ -63,7 +63,4 @@ public class LocalhostService extends GameService {
         udpService.stop();
     }
     
-    
-
-    
 }

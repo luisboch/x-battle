@@ -4,6 +4,7 @@
 package com.pucpr.game.states.game.engine;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.states.game.engine.steering.Steering;
@@ -58,6 +59,15 @@ public abstract class ActorObject {
         this.size = new Vector2(width, height);
     }
 
+    public ActorObject(float radius, float mass, float maxVel, float maxForce, Vector2 size) {
+        this.radius = radius;
+        this.mass = mass;
+        this.maxVel = maxVel;
+        this.maxForce = maxForce;
+        this.size = size;
+        this.type = _getType();
+    }
+
     public long getuID() {
         return uID;
     }
@@ -95,6 +105,7 @@ public abstract class ActorObject {
         direction.set(pos);
         return this;
     }
+
     public ActorObject setVelocity(Vector2 pos) {
         velocity.set(pos);
         return this;
@@ -134,4 +145,11 @@ public abstract class ActorObject {
     }
 
     public abstract TextureRegion getTexture();
+
+    public float getAngle() {
+        return getDirection().angle();
+    }
+
+    public void contact(ActorObject e) {
+    }
 }

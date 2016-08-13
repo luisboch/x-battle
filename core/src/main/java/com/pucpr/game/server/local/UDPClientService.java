@@ -145,7 +145,6 @@ public class UDPClientService {
                     if (loopQty == 10) {
                         loopAvgSum /= loopQty;
                         loopQty = 0;
-                        System.out.println("Loop: " + loopAvgSum);
                         loopAvgSum = 0;
                     }
 
@@ -202,8 +201,6 @@ public class UDPClientService {
                     long waitTime = sendPckMs - synchTime;
 
                     if (waitTime > 0) {
-
-                        System.out.println("Waiting for " + waitTime);
                         Thread.sleep(waitTime);
                     }
 

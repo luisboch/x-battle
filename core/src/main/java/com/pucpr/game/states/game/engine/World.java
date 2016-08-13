@@ -7,10 +7,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.server.ActorControl;
 import com.pucpr.game.states.game.Planet;
+import com.pucpr.game.states.game.Player;
+import com.pucpr.game.states.game.Player2;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  *
@@ -20,28 +26,27 @@ import java.util.Map;
  */
 public class World {
 
-    private final List<ActorObject> actors = new ArrayList<ActorObject>();
+    private final Queue<ActorObject> actors = new ConcurrentLinkedQueue<ActorObject>();
 
-    private final Map<ActorObject, ActorControl> controledRef
+    private final Map<ActorObject, ActorControl> controllRef
             = new HashMap<ActorObject, ActorControl>();
 
+    private final Map<ActorObject, ProjectileInfo> projectileRef
+            = new HashMap<ActorObject, ProjectileInfo>();
+
+    private final Map<Projectile, Long> projectiles
+            = new ConcurrentHashMap<Projectile, Long>();
+    private final Queue<ActorObject> deadObjects = new ConcurrentLinkedQueue<ActorObject>();
+
     private final List<ActorObject> planets = new ArrayList<ActorObject>();
+    private final List<Explosion> explosions = new ArrayList<Explosion>();
 
     private final float width;
     private final float height;
 
-    private final Vector2 gravity;
-
-    public World(float width, float height, Vector2 gravity) {
-        this.width = width;
-        this.height = height;
-        this.gravity = gravity;
-    }
-
     public World(float width, float height) {
         this.width = width;
         this.height = height;
-        this.gravity = new Vector2(0, 0);
     }
 
     public World add(ActorObject actor) {
@@ -56,7 +61,7 @@ public class World {
     }
 
     public List<ActorObject> getActors() {
-        return actors;
+        return new ArrayList<ActorObject>(actors);
     }
 
     public List<ActorObject> getVisibleActors(Vector2 center, Float viewSize) {
@@ -78,10 +83,55 @@ public class World {
 
     }
 
+    public ActorObject getClosestActor(Vector2 center, Float viewSize) {
+
+        final List<Class<? extends ActorObject>> allowedTypes = new ArrayList<Class<? extends ActorObject>>(2);
+        allowedTypes.add(Player.class);
+        allowedTypes.add(Player2.class);
+
+        return getClosestActor(center, viewSize, allowedTypes);
+    }
+
+    public ActorObject getClosestActor(Vector2 center, Float viewSize, Class<? extends ActorObject>... allowedTypes) {
+        List<Class<? extends ActorObject>> list = Arrays.asList(allowedTypes);
+        return getClosestActor(center, viewSize, list);
+    }
+
+    public ActorObject getClosestActor(Vector2 center, Float viewSize, List<Class<? extends ActorObject>> allowedTypes) {
+        if (center == null || viewSize == null) {
+            throw new IllegalArgumentException("All params are required!");
+        }
+
+        if (allowedTypes == null) {
+            allowedTypes = new ArrayList<Class<? extends ActorObject>>(2);
+            allowedTypes.add(Player.class);
+            allowedTypes.add(Player2.class);
+        }
+
+        ActorObject closest = null;
+        viewSize = viewSize * 1.3f; //ads 30% to view
+        Float closestDis = null;
+
+        for (ActorObject obj : actors) {
+            float dst = obj.getPosition().dst(center);
+            if (allowedTypes.contains(obj.getClass()) && dst < viewSize) {
+                if (closest == null || dst < closestDis) {
+                    closest = obj;
+                    closestDis = dst;
+                }
+            }
+        }
+
+        return closest;
+    }
+
     public void calculate() {
+
+        removeDeadObjects();
 
         float secs = Gdx.app.getGraphics().getDeltaTime();
         for (ActorObject obj : actors) {
+            resolveImpact(obj);
 
             /**
              * Primeiro calcula as forças.<br>
@@ -92,18 +142,36 @@ public class World {
              * </ul>
              * Depois multiplica a soma das forças pelo tempo gasto no loop
              * (secs) e limita pela força máxima do objeto (questionável). <br>
+             * <br>
              * Aplica a variação da massa (força divida pela massa). <br>
+             * <br>
              * Seta velocidade no objeto, considerando a soma da força.<br>
              * Move o objeto, de acordo com a velocidade atual (já com a força
              * aplicada) multiplicado pelo tempo gasto no loop (secs).
              */
+            if (obj instanceof Projectile) {
+                Projectile pro = (Projectile) obj;
+                if (pro.canExplodeNow()) {
+                    createExplosion(pro);
+                } else if (System.currentTimeMillis() - projectiles.get(pro) > pro.getLifeTime()) {
+                    deadObjects.add(obj);
+                    continue;
+                }
+            } else if (obj instanceof Planet || obj instanceof Explosion) {
+                continue;
+            }
+
             final Vector2 aux = calculateSteering(obj);
 
             final Vector2 control;
             final Vector2 forces;
 
             if (!obj.getClass().equals(Planet.class)) {
-                control = calculateControl(obj);
+                if (obj.getClass().equals(Player.class)) {
+                    control = calculateControl((Player) obj);
+                } else {
+                    control = new Vector2();
+                }
                 forces = calculateForceInfluence(obj);
             } else {
                 control = new Vector2();
@@ -118,6 +186,13 @@ public class World {
             if (!obj.getVelocity().isZero()) {
                 final Vector2 velSec = obj.getVelocity().cpy().scl(secs);
                 obj.setPosition(obj.getPosition().add(velSec));
+            }
+        }
+
+        for (Explosion ex : explosions) {
+            ex.tick();
+            if (!ex.isAlive()) {
+                deadObjects.add(ex);
             }
         }
 
@@ -138,13 +213,31 @@ public class World {
 
             final Vector2 forceField = objA.getPosition().cpy().sub(pln.getPosition());
             final float dist = forceField.len();
-            
+
             if (dist > 300) {
                 continue; // Ignore objects that is too far away.
             }
-            
-            final float intensity = objA.getMass() * pln.getMass();
 
+            final float intensity = objA.getMass() * pln.getMass();
+            System.out.println("Pl: Int: " + intensity);
+            final float distSqr = dist * dist;
+
+            forceField.nor();
+            forceField.scl(intensity / distSqr);
+            result.sub(forceField);
+        }
+
+        for (Explosion expl : explosions) {
+
+            final Vector2 forceField = objA.getPosition().cpy().sub(expl.getPosition());
+            final float dist = forceField.len();
+
+            if (dist > expl.getRadius() + objA.getRadius()) {
+                continue; // Ignore objects that is too far away.
+            }
+
+            final float intensity = (dist < expl.getRadius()) ? expl.getCurrentForce() : 1 - ((dist - expl.getRadius()) / expl.getRadius()) * expl.getCurrentForce();
+            System.out.println("Int: " + intensity);
             final float distSqr = dist * dist;
 
             forceField.nor();
@@ -166,13 +259,13 @@ public class World {
     }
 
     private void bind(ActorObject actor, ActorControl act) {
-        controledRef.put(actor, act);
+        controllRef.put(actor, act);
     }
 
-    private Vector2 calculateControl(ActorObject obj) {
-        if (controledRef.containsKey(obj)) {
+    private Vector2 calculateControl(Player obj) {
+        if (controllRef.containsKey(obj)) {
             Vector2 cal = new Vector2(0.01f, 0.01f);
-            ActorControl act = controledRef.get(obj);
+            ActorControl act = controllRef.get(obj);
 
             if (!obj.getDirection().isZero() && obj.getVelocity().isZero()) {
                 cal.set(obj.getDirection().isZero() ? obj.getVelocity().nor() : obj.getDirection().nor());
@@ -194,10 +287,83 @@ public class World {
                 cal = new Vector2(0, 0);
             }
 
+            // Bombs?
+            if (act.isAction1()) {
+                final Projectile action1 = obj.action1(this);
+                if (action1 != null) {
+                    createProjectile(obj, action1);
+                }
+            }
+
             return cal;
         }
 
         return new Vector2();
+    }
+
+    public <E extends Projectile> void createProjectile(ActorObject from, E projectile) {
+
+        long now = System.currentTimeMillis();
+        final ProjectileInfo nfo;
+
+        if (!projectileRef.containsKey(from)) {
+            nfo = new ProjectileInfo();
+            projectileRef.put(from, nfo);
+        } else {
+            nfo = projectileRef.get(from);
+        }
+
+        if (nfo.usedTypes.containsKey(projectile.getClass())) {
+            final Long lastShot = nfo.usedTypes.get(projectile.getClass());
+
+            if (now - lastShot <= projectile.getReloadTime()) {
+                return; // User must wait for reload time before add new Projectile...
+            }
+        }
+
+        nfo.usedTypes.put(projectile.getClass(), now);
+        Vector2 pos = from.getPosition();
+        pos.add(from.getDirection().nor().scl(from.getRadius() + projectile.getRadius() + 1));
+
+        projectile.setPosition(pos);
+        projectile.setDirection(from.getDirection());
+        projectile.setVelocity(from.getDirection().nor().scl(projectile.getInitialVelocity()));
+
+        projectiles.put(projectile, now);
+        actors.add(projectile);
+    }
+
+    private void removeDeadObjects() {
+
+        ActorObject obj = null;
+
+        while ((obj = deadObjects.poll()) != null) {
+
+            if (obj instanceof Projectile) {
+                projectiles.remove(obj);
+            } else if (obj instanceof Explosion) {
+                explosions.remove(obj);
+            }
+
+            actors.remove(obj);
+            System.out.println("Removing " + obj.getType());
+        }
+    }
+
+    private void createExplosion(Projectile p) {
+        final Explosion exp = p.createExplosion();
+        explosions.add(exp);
+        actors.add(exp);
+        deadObjects.add(p);
+    }
+
+    private void resolveImpact(ActorObject ob) {
+        for (ActorObject act : actors) {
+            if (!ob.equals(act)
+                    && ob.getPosition().dst(act.getPosition()) <= (ob.getRadius() + act.getRadius())) {
+                ob.contact(act);
+            }
+        }
     }
 
     public static interface ContactListener {

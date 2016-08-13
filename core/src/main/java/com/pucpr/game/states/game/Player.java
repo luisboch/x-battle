@@ -10,6 +10,10 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
+import com.pucpr.game.states.game.engine.Projectile;
+import com.pucpr.game.states.game.engine.SimpleShot;
+import com.pucpr.game.states.game.engine.World;
+import com.pucpr.game.states.game.engine.steering.ProjectileSteering;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,14 +30,14 @@ public class Player extends ActorObject {
     float stateTime;
 
     public Player() {
-        super(15, 1f, 500, 50, 50);
+        super(25, 1f, 500, 50, 50);
         loadAnnimation();
     }
-    
+
     private void loadAnnimation() {
         ResourceLoader loader = ResourceLoader.getInstance();
-        Texture texture = loader.getTexture("data/image/nave.png");
-        TextureRegion[][] split = TextureRegion.split(texture, 50, 50);
+        Texture texture = loader.getTexture("data/image/ships/SR-91A.png");
+        TextureRegion[][] split = TextureRegion.split(texture, texture.getWidth(), texture.getHeight());
 
         animation.put(State.IDLE, new Animation(01f, split[0][0]));
         animation.put(State.RUNNING, new Animation(01f, split[0][0]));
@@ -54,4 +58,7 @@ public class Player extends ActorObject {
         return animation.get(state).getKeyFrame(stateTime);
     }
 
+    public Projectile action1(World w) {
+        return new SimpleShot(new ProjectileSteering(), this);
+    }
 }

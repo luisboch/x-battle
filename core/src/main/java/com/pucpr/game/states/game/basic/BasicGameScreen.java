@@ -61,6 +61,7 @@ public class BasicGameScreen implements GameScreenState {
     protected Vector3 mousePos = new Vector3();
 
     protected Player player = new Player();
+    protected Player player2 = new Player();
     protected ActorControl playerControl;
 
     protected List<Planet> planet = new ArrayList<Planet>();
@@ -91,12 +92,15 @@ public class BasicGameScreen implements GameScreenState {
             service = new RemoteSevice(GameConfig.serverHost);
         }
 
+        playerControl = service.insert(player2);
+        player2.setPosition(new Vector2(-200, -200));
         playerControl = service.insert(player);
 
-        for(int i = 1; i < 50; i++){
+        for (int i = 1; i < 50; i++) {
             Planet p = new Planet();
-            p.setPosition(new Vector2(500*i, 150*i));
+            p.setPosition(new Vector2(500 * i, 150 * i));
             service.insertPlanet(p);
+            
         }
     }
 
@@ -131,9 +135,9 @@ public class BasicGameScreen implements GameScreenState {
 
         final PlayerStatus status = PlayerStatus.getInstance();
 
-        int[] baseMap = {0, 1, 2, 3};
+        final int[] baseMap = {0, 1, 2, 3};
 
-        int[] topMap = {4, 5};
+        final int[] topMap = {4, 5};
 
         batch.getProjectionMatrix().set(camera.combined);
         render.setView(camera);
@@ -144,9 +148,10 @@ public class BasicGameScreen implements GameScreenState {
 
         for (ActorObject obj : service.getActors()) {
 
-            Vector2 position = obj.getPosition(); // that's the box's center position
+            final Vector2 position = obj.getPosition(); // that's the box's center position
 
-            float angle = obj.getDirection().angle();
+            final float angle = obj.getAngle();
+
 //            System.out.println("position: " + position + ", angle: " + angle + ", size: " + obj.getSize());
             final TextureRegion texture = obj.getTexture();
             if (texture != null) {
@@ -190,6 +195,25 @@ public class BasicGameScreen implements GameScreenState {
         } else {
             playerControl.setRight(false);
         }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)) {
+            playerControl.setAction1(true);
+        } else {
+            playerControl.setAction1(false);
+        }
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) {
+            playerControl.setAction2(true);
+        } else {
+            playerControl.setAction2(false);
+        }
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
+            playerControl.setAction3(true);
+        } else {
+            playerControl.setAction3(false);
+        }
+
     }
 
     public void setGameState(GameState gameState) {

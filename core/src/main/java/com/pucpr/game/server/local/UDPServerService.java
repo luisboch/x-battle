@@ -234,7 +234,6 @@ public class UDPServerService {
 
                     if (timeProcessing < sendPckMs) { // Ensure that we wait 50ms on loop (when it reaches ignore stop)
                         long wait = sendPckMs - timeProcessing;
-                        System.out.println("Waiting for " + wait);
                         Thread.sleep(wait);
                     }
                 }

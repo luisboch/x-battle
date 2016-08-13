@@ -22,7 +22,7 @@ public class Planet extends ActorObject{
     private Animation animation;
 
     public Planet() {
-        super(100, 1000000, 100, 100);
+        super(50, 100000, 100, 100);
         loadAnnimation();
     }
 

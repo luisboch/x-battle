@@ -32,8 +32,8 @@ public class Player2 extends ActorObject {
 
     private void loadAnnimation() {
         ResourceLoader loader = ResourceLoader.getInstance();
-        Texture texture = loader.getTexture("data/image/nave2.png");
-        TextureRegion[][] split = TextureRegion.split(texture, 50, 50);
+        Texture texture = loader.getTexture("data/image/ships/Su-51K in.png");
+        TextureRegion[][] split = TextureRegion.split(texture, texture.getWidth(), texture.getHeight());
 
         animation.put(State.IDLE, new Animation(01f, split[0][0]));
         animation.put(State.RUNNING, new Animation(01f, split[0][0]));
