@@ -11,10 +11,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
 import com.pucpr.game.states.game.engine.Projectile;
+import com.pucpr.game.states.game.engine.Shot;
 import com.pucpr.game.states.game.engine.SimpleShot;
 import com.pucpr.game.states.game.engine.World;
 import com.pucpr.game.states.game.engine.steering.ProjectileSteering;
+import com.pucpr.game.states.game.engine.steering.Pursuit;
+import com.pucpr.game.states.game.engine.steering.WeightSteeringStrategy;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,5 +65,34 @@ public class Player extends ActorObject {
 
     public Projectile action1(World w) {
         return new SimpleShot(new ProjectileSteering(), this);
+    }
+
+    public Projectile action2(World w) {
+        
+        final List<Class<? extends ActorObject>> target = new ArrayList<Class<? extends ActorObject>>();
+        
+        final List<ActorObject> ignored = new ArrayList<ActorObject>();
+        ignored.add(this);
+        target.add(Player.class);
+        
+        final Player other = (Player) w.getClosestActor(this.getPosition(), 2000f, target, ignored);
+
+        final WeightSteeringStrategy stg = new WeightSteeringStrategy();
+        stg.add(new Pursuit(other), 100);
+        stg.add(new ProjectileSteering(), 100);
+
+        return new Shot(stg, this, other, 100);
+    }
+
+    public Class<? extends Projectile> getAction1Type() {
+        return SimpleShot.class;
+    }
+
+    public Class<? extends Projectile> getAction2Type() {
+        return Shot.class;
+    }
+
+    public Class<? extends Projectile> getAction3Type() {
+        return SimpleShot.class;
     }
 }

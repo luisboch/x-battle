@@ -8,15 +8,23 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.resources.ResourceLoader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author luis
  */
 public abstract class Projectile extends ActorObject {
-
+    
+    private static Map<Class<? extends Projectile>, Float> reloadTimeConfig = new HashMap<Class<? extends Projectile>, Float>();
+    static {
+        reloadTimeConfig.put(Shot.class, 500f);
+        reloadTimeConfig.put(SimpleShot.class, 300f);
+        
+        
+    }
     private Animation animation;
-    protected int reloadTime = 500;
     protected float explosionRadius = 100;
     protected float explosionForce = 100000; // The force that this Projectile cause;
     protected int lifeTime = 7000; // The life of this projectile (max will be 30 secs)
@@ -25,11 +33,10 @@ public abstract class Projectile extends ActorObject {
     protected ActorObject from;
 
     public Projectile(final String image, float radius, float mass, float maxVel,
-            float maxForce, Vector2 size, int reloadTime, float explosionRadius,
+            float maxForce, Vector2 size, float explosionRadius,
             float explosionForce, int lifeTime) {
         super(radius, mass, maxVel, maxForce, size);
         loadAnnimation(image);
-        this.reloadTime = reloadTime;
         this.explosionRadius = explosionRadius;
         this.explosionForce = explosionForce;
         this.lifeTime = lifeTime > 30000 ? 30000 : lifeTime;
@@ -48,15 +55,11 @@ public abstract class Projectile extends ActorObject {
         animation = new Animation(01f, split[0][0]);
     }
 
-    public int getReloadTime() {
-        return reloadTime;
-    }
-
     public int getLifeTime() {
         return lifeTime;
     }
 
-    public boolean canExplodeNow() {
+    public boolean canExplodeNow(boolean timedout) {
         return canExplode;
     }
 
@@ -79,6 +82,10 @@ public abstract class Projectile extends ActorObject {
         if (e != null && from != null && !from.equals(e) && !(e instanceof Explosion)) {
             canExplode = true;
         }
+    }
+
+    public static Map<Class<? extends Projectile>, Float> getReloadTimeConfig() {
+        return reloadTimeConfig;
     }
 
 }

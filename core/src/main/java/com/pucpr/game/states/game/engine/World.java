@@ -89,15 +89,15 @@ public class World {
         allowedTypes.add(Player.class);
         allowedTypes.add(Player2.class);
 
-        return getClosestActor(center, viewSize, allowedTypes);
+        return getClosestActor(center, viewSize, allowedTypes, new ArrayList<ActorObject>());
     }
 
     public ActorObject getClosestActor(Vector2 center, Float viewSize, Class<? extends ActorObject>... allowedTypes) {
         List<Class<? extends ActorObject>> list = Arrays.asList(allowedTypes);
-        return getClosestActor(center, viewSize, list);
+        return getClosestActor(center, viewSize, list, new ArrayList<ActorObject>());
     }
 
-    public ActorObject getClosestActor(Vector2 center, Float viewSize, List<Class<? extends ActorObject>> allowedTypes) {
+    public ActorObject getClosestActor(Vector2 center, Float viewSize, List<Class<? extends ActorObject>> allowedTypes, List<ActorObject> ignored) {
         if (center == null || viewSize == null) {
             throw new IllegalArgumentException("All params are required!");
         }
@@ -113,15 +113,16 @@ public class World {
         Float closestDis = null;
 
         for (ActorObject obj : actors) {
-            float dst = obj.getPosition().dst(center);
-            if (allowedTypes.contains(obj.getClass()) && dst < viewSize) {
-                if (closest == null || dst < closestDis) {
-                    closest = obj;
-                    closestDis = dst;
+            if (!ignored.contains(obj)) {
+                float dst = obj.getPosition().dst(center);
+                if (allowedTypes.contains(obj.getClass()) && dst < viewSize) {
+                    if (closest == null || dst < closestDis) {
+                        closest = obj;
+                        closestDis = dst;
+                    }
                 }
             }
         }
-
         return closest;
     }
 
@@ -151,10 +152,14 @@ public class World {
              */
             if (obj instanceof Projectile) {
                 Projectile pro = (Projectile) obj;
-                if (pro.canExplodeNow()) {
+                if (pro.canExplodeNow(false)) {
                     createExplosion(pro);
                 } else if (System.currentTimeMillis() - projectiles.get(pro) > pro.getLifeTime()) {
-                    deadObjects.add(obj);
+                    if (pro.canExplodeNow(true)) {
+                        createExplosion(pro);
+                    } else {
+                        deadObjects.add(obj);
+                    }
                     continue;
                 }
             } else if (obj instanceof Planet || obj instanceof Explosion) {
@@ -219,7 +224,7 @@ public class World {
             }
 
             final float intensity = objA.getMass() * pln.getMass();
-            System.out.println("Pl: Int: " + intensity);
+
             final float distSqr = dist * dist;
 
             forceField.nor();
@@ -237,7 +242,7 @@ public class World {
             }
 
             final float intensity = (dist < expl.getRadius()) ? expl.getCurrentForce() : 1 - ((dist - expl.getRadius()) / expl.getRadius()) * expl.getCurrentForce();
-            System.out.println("Int: " + intensity);
+
             final float distSqr = dist * dist;
 
             forceField.nor();
@@ -289,9 +294,16 @@ public class World {
 
             // Bombs?
             if (act.isAction1()) {
-                final Projectile action1 = obj.action1(this);
-                if (action1 != null) {
-                    createProjectile(obj, action1);
+                final Projectile pro = obj.action1(this);
+                if (pro != null && canPlayerCreateProjectile(obj, obj.getAction1Type())) {
+                    createProjectile(obj, pro);
+                }
+            }
+            // Bombs?
+            if (act.isAction2()) {
+                final Projectile pro = obj.action2(this);
+                if (pro != null && canPlayerCreateProjectile(obj, obj.getAction2Type())) {
+                    createProjectile(obj, pro);
                 }
             }
 
@@ -303,6 +315,18 @@ public class World {
 
     public <E extends Projectile> void createProjectile(ActorObject from, E projectile) {
 
+        Vector2 pos = from.getPosition();
+        pos.add(from.getDirection().nor().scl(from.getRadius() + projectile.getRadius() + 1));
+
+        projectile.setPosition(pos);
+        projectile.setDirection(from.getDirection());
+        projectile.setVelocity(from.getDirection().nor().scl(projectile.getInitialVelocity()));
+
+        projectiles.put(projectile, System.currentTimeMillis());
+        actors.add(projectile);
+    }
+
+    private boolean canPlayerCreateProjectile(Player from, Class<? extends Projectile> type) {
         long now = System.currentTimeMillis();
         final ProjectileInfo nfo;
 
@@ -313,24 +337,17 @@ public class World {
             nfo = projectileRef.get(from);
         }
 
-        if (nfo.usedTypes.containsKey(projectile.getClass())) {
-            final Long lastShot = nfo.usedTypes.get(projectile.getClass());
+        if (nfo.usedTypes.containsKey(type)) {
+            final Long lastShot = nfo.usedTypes.get(type);
 
-            if (now - lastShot <= projectile.getReloadTime()) {
-                return; // User must wait for reload time before add new Projectile...
+            if (now - lastShot <= Projectile.getReloadTimeConfig().get(type)) {
+                return false; // User must wait for reload time before add new Projectile...
             }
         }
 
-        nfo.usedTypes.put(projectile.getClass(), now);
-        Vector2 pos = from.getPosition();
-        pos.add(from.getDirection().nor().scl(from.getRadius() + projectile.getRadius() + 1));
+        nfo.usedTypes.put(type, now);
 
-        projectile.setPosition(pos);
-        projectile.setDirection(from.getDirection());
-        projectile.setVelocity(from.getDirection().nor().scl(projectile.getInitialVelocity()));
-
-        projectiles.put(projectile, now);
-        actors.add(projectile);
+        return true;
     }
 
     private void removeDeadObjects() {
@@ -346,7 +363,6 @@ public class World {
             }
 
             actors.remove(obj);
-            System.out.println("Removing " + obj.getType());
         }
     }
 

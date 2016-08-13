@@ -10,8 +10,7 @@ public class Shot extends SimpleShot {
     protected ActorObject target;
     protected int minProximity;
 
-    
-    public Shot(Steering steering,ActorObject from, ActorObject target, int minProximity) {
+    public Shot(Steering steering, ActorObject from, ActorObject target, int minProximity) {
         super(steering, from);
         init(target, minProximity);
     }
@@ -19,13 +18,11 @@ public class Shot extends SimpleShot {
     private void init(ActorObject target, int minProximity) {
         this.target = target;
         this.minProximity = minProximity;
-        if(target == null){
+        System.out.println("Target: " + target.getuID());
+        System.out.println("From: " + from.getuID());
+        if (target == null) {
             throw new IllegalArgumentException("Target is required");
         }
     }
-
-    @Override
-    public boolean canExplodeNow() {
-        return getPosition().dst(target.getPosition()) < minProximity;
-    }
+    
 }

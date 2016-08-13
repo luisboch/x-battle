@@ -189,7 +189,7 @@ public class ResourceLoader {
 
         if (!loadedTextures.containsKey(key)) {
             loadedTextures.put(key, new Texture(Gdx.files.internal(key)));
-            System.out.println("X-BATTLE WARN: Loading not loaded texture... "
+            System.out.println("X-BATTLE WARN: Loading not loaded texture: " + key + "... "
                     + "please add this texture to loader, to improve game performance!");
         }
 

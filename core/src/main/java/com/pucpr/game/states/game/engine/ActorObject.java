@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.states.game.UIDManager;
 import com.pucpr.game.states.game.engine.steering.Steering;
 
 /**
@@ -17,7 +18,8 @@ import com.pucpr.game.states.game.engine.steering.Steering;
  */
 public abstract class ActorObject {
 
-    private long uID;
+    private long uID = UIDManager.next(this);
+    
     private final float radius;
     private final float mass;
     private final float maxVel;

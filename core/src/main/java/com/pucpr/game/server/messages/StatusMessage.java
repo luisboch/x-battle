@@ -4,7 +4,6 @@
 package com.pucpr.game.server.messages;
 
 import com.pucpr.game.states.game.engine.ActorObject;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;

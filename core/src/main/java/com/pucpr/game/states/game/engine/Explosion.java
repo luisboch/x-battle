@@ -98,7 +98,7 @@ public class Explosion extends ActorObject {
         textures.add(split[3][5]);
         textures.add(split[3][6]);
 
-        animation = new Animation(0.2f, textures);
+        animation = new Animation(0.1f, textures);
 
         stateTime = 0;
     }

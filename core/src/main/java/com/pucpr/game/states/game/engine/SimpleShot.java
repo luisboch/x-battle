@@ -11,7 +11,7 @@ public class SimpleShot extends Projectile {
     protected ActorObject target;
 
     public SimpleShot(Steering steering, ActorObject from) {
-        super("disasteroids/fire.png", 5, 3f, 600, 400, new Vector2(30, 15), 500, 20f, 10000f, 15000);
+        super("disasteroids/fire.png", 5, 3f, 600, 400, new Vector2(30, 15), 20f, 10000f, 15000);
         init(steering, from);
         
     }
