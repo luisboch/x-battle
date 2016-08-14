@@ -23,8 +23,7 @@ public class Shot extends SimpleShot {
     private void init(ActorObject target, int minProximity) {
         this.target = target;
         this.minProximity = minProximity;
-        System.out.println("Target: " + target.getuID());
-        System.out.println("From: " + from.getuID());
+        
         if (target == null) {
             throw new IllegalArgumentException("Target is required");
         }

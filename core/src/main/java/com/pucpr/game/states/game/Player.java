@@ -68,17 +68,20 @@ public class Player extends ActorObject {
     }
 
     public Projectile action2(World w) {
-        
+
         final List<Class<? extends ActorObject>> target = new ArrayList<Class<? extends ActorObject>>();
-        
+
         final List<ActorObject> ignored = new ArrayList<ActorObject>();
         ignored.add(this);
         target.add(Player.class);
-        
-        final Player other = (Player) w.getClosestActor(this.getPosition(), 2000f, target, ignored);
 
+        final Player other = (Player) w.getClosestActor(this.getPosition(), 2000f, target, ignored);
         final WeightSteeringStrategy stg = new WeightSteeringStrategy();
-        stg.add(new Pursuit(other), 100);
+
+        if (other != null) {
+            stg.add(new Pursuit(other), 100);
+        }
+
         stg.add(new ProjectileSteering(), 100);
 
         return new Shot(stg, this, other, 100);

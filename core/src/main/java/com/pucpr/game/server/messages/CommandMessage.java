@@ -128,10 +128,10 @@ public class CommandMessage extends Message {
         command5 = getBit(0, cmdb1);
 
         // ACTION 2 
-        command6 = getBit(5, cmdb2);
-
+        command6 = getBit(1, cmdb2);
+        
         // ACTION 3
-        command7 = getBit(4, cmdb2);
+        command7 = getBit(0, cmdb2);
 
         // MOUSE X
         mouseX = (short) bytesToShort(message[2], message[3]);

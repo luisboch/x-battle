@@ -158,7 +158,7 @@ public class UDPServerService {
                     info = new ClientInfo();
                     ActorObject actor = ((ConnectMessage) msg).getActor();
 
-                    info.object = world.create(actor);
+                    info.control = world.create(actor);
                     info.addr = address;
                     info.lastMessageSeq = msgSeq;
                     info.viewSize = connect.getScreenLimit();
@@ -175,16 +175,16 @@ public class UDPServerService {
                 if (info != null && isUpdatedMsg(info, msgSeq)) {
                     if (msg instanceof CommandMessage) {
                         CommandMessage cmd = (CommandMessage) msg;
-                        info.object.setUp(cmd.isUP());
-                        info.object.setRight(cmd.isRIGHT());
-                        info.object.setDown(cmd.isDOWN());
-                        info.object.setLeft(cmd.isLEFT());
-                        info.object.setForce(cmd.isFORCE());
-                        info.object.setAction1(cmd.isACTION1());
-                        info.object.setAction2(cmd.isACTION2());
-                        info.object.setAction3(cmd.isACTION3());
-                        info.object.setMouseX(cmd.getMouseX());
-                        info.object.setMouseY(cmd.getMouseY());
+                        info.control.setUp(cmd.isUP());
+                        info.control.setRight(cmd.isRIGHT());
+                        info.control.setDown(cmd.isDOWN());
+                        info.control.setLeft(cmd.isLEFT());
+                        info.control.setForce(cmd.isFORCE());
+                        info.control.setAction1(cmd.isACTION1());
+                        info.control.setAction2(cmd.isACTION2());
+                        info.control.setAction3(cmd.isACTION3());
+                        info.control.setMouseX(cmd.getMouseX());
+                        info.control.setMouseY(cmd.getMouseY());
                     } else if (msg instanceof DisconnectMessage) {
                         clients.remove(address);
                         senderProcessor.messages.add(new ClientMesg(address, new DisconnectMessage()));
@@ -233,7 +233,6 @@ public class UDPServerService {
                     ClientMesg pool = null;
                     while ((pool = messages.peek()) != null && !stopped) {
                         messageParser.setMessageSeq(getNextMessageSeq(pool.addr));
-                        System.out.println("Using msgseq: "+messageParser.getMessageSeq());
                         byte[] sendData = messageParser.build(pool.msg);
                         DatagramPacket sendPacket = new DatagramPacket(
                                 sendData, sendData.length, pool.addr, UDP_CLIENT_PORT);
@@ -244,9 +243,9 @@ public class UDPServerService {
                     // All times add status msg
                     for (ClientInfo c : clients.values()) {
                         final StatusMessage msg = new StatusMessage();
-                        final List<ActorObject> objs = world.getVisibleActors(c.object.getActor().getPosition(), (float) c.viewSize);
+                        final List<ActorObject> objs = world.getVisibleActors(c.control.getActor().getPosition(), (float) c.viewSize);
                         msg.addAll(objs);
-                        msg.setCurrentPlayer(c.object.getActor());
+                        msg.setCurrentPlayer(c.control.getActor());
                         messages.offer(new ClientMesg(c.addr, msg));
                     }
 
@@ -291,7 +290,7 @@ public class UDPServerService {
     private static class ClientInfo {
 
         private InetAddress addr;
-        private ActorControl object;
+        private ActorControl control;
         private long lastReceivedMessage;
         private short lastMessageSeq = -1;
         private short messageSeq = 0;

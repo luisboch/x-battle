@@ -208,15 +208,11 @@ public class UDPClientService {
                 foundActors.add(or.getuID());
             }
 
-            System.out.println("MapSize:" + actors.size());
-            
             for (Short t : actors.keySet()) {
                 if (!foundActors.contains(t)) {
                     actors.remove(t);
                 }
             }
-
-            System.out.println("MapSize:" + actors.size());
         }
 
     }
@@ -239,7 +235,6 @@ public class UDPClientService {
                     Message pool = null;
                     while ((pool = messages.peek()) != null && !stopped) {
                         messageParser.setMessageSeq(getNextMessageSeq());
-                        System.out.println("Using msgseq: " + messageParser.getMessageSeq());
                         byte[] sendData = messageParser.build(pool);
                         DatagramPacket sendPacket = new DatagramPacket(
                                 sendData, sendData.length, serverAddr, UDP_SERVER_PORT);

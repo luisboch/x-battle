@@ -59,7 +59,7 @@ public class ProtocolTester {
                 || !commandMessage.isLEFT()
                 || commandMessage.isFORCE()
                 || !commandMessage.isACTION1()
-                || commandMessage.isACTION2()
+                || !commandMessage.isACTION2()
                 || commandMessage.isACTION3()
                 || commandMessage.getMouseX() != mouseX
                 || commandMessage.getMouseY() != mouseY) {
