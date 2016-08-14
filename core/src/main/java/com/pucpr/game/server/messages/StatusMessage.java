@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class StatusMessage extends Message {
 
-    private static final int SIZE_PER_EL = 9;
+    private static final int SIZE_PER_EL = 10;
 
     private boolean valid;
     private ActorObject currentPlayer;
@@ -83,6 +83,7 @@ public class StatusMessage extends Message {
 
         add(uidb, data, idx);
         idx += INT_BYTE_SIZE;
+        data[idx++] = currentPlayer.getAnnimationState();
 
         for (ActorObject act : objects.keySet()) {
             data[idx] = objects.get(act);
@@ -95,6 +96,7 @@ public class StatusMessage extends Message {
             idx += INT_BYTE_SIZE;
             add(shortToByte(act.getuID()), data, idx);
             idx += INT_BYTE_SIZE;
+            data[idx++] = act.getAnnimationState();
         }
         return data;
     }
@@ -132,10 +134,10 @@ public class StatusMessage extends Message {
             byte[] posY = new byte[]{messageData[idx++], messageData[idx++]};
 
             byte[] angle = new byte[]{messageData[idx++], messageData[idx++]};
-            
+
             byte[] uidb = new byte[]{messageData[idx++], messageData[idx++]};
 
-            final ActorObject actor = getActor(type, bytesToShort(posX), bytesToShort(posY), bytesToShort(angle), bytesToShort(uidb));
+            final ActorObject actor = getActor(type, bytesToShort(posX), bytesToShort(posY), bytesToShort(angle), bytesToShort(uidb), messageData[idx++]);
 
             if (actor != null) {
                 if (loop == 0) { // is first element? then it is the currentplayer

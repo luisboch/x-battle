@@ -127,7 +127,7 @@ public abstract class Message {
         return 0;
     }
 
-    protected ActorObject getActor(byte type, int posX, int posY, int angle, short uid) {
+    protected ActorObject getActor(byte type, int posX, int posY, int angle, short uid, byte annimationState) {
         ActorObject act = null;
         if (type == 1) {
             act = new Player();
@@ -148,6 +148,7 @@ public abstract class Message {
             act.setVelocity(vel);
             act.setDirection(act.getVelocity().cpy().nor());
             act.setuID(uid);
+            act.setAnnimationState(annimationState);
         }
 
         return act;

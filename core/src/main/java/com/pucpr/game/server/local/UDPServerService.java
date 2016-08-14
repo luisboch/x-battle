@@ -203,7 +203,7 @@ public class UDPServerService {
                 rs = false;
             } else if (info.lastMessageSeq < msgSeq) {
                 rs = true;
-            } else if (info.lastMessageSeq > 31910 && msgSeq < 10) {
+            } else if (info.lastMessageSeq > 31000 && msgSeq < 1000) {
                 rs = true;
             }
 

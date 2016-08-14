@@ -35,7 +35,7 @@ public class Player extends ActorObject {
     float stateTime;
 
     public Player() {
-        super(25, 1f, 500, 50, 50);
+        super(25, 1f, 200, 50, 50);
         loadAnnimation();
     }
 

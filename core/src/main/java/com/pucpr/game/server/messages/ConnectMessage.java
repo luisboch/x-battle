@@ -71,7 +71,7 @@ public class ConnectMessage extends Message {
     }
 
     public ActorObject getActor() {
-        return getActor(type, 0, 0, 0, (short) 0);
+        return getActor(type, 0, 0, 0, (short) 0, (byte) 0);
     }
 
     public short getScreenLimit() {

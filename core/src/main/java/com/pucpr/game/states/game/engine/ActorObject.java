@@ -156,4 +156,13 @@ public abstract class ActorObject {
 
     public void contact(ActorObject e) {
     }
+
+    public byte getAnnimationState() {
+        return 0;
+    }
+
+    public void setAnnimationState(byte val) {
+        // Ignored...
+    }
+
 }

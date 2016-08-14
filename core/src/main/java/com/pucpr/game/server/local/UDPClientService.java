@@ -16,8 +16,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -33,7 +36,7 @@ public class UDPClientService {
     private final long sendPckMs = 20;
     private final RemoteSevice service;
     private ActorControl control;
-    private List<ActorObject> actors = new ArrayList<ActorObject>();
+    private final Map<Short, ActorObject> actors = new ConcurrentHashMap<Short, ActorObject>();
     private long lastReceivedMessage;
     private final MessageParser messageParser = new MessageParser();
 
@@ -45,7 +48,7 @@ public class UDPClientService {
     private InetAddress serverAddr;
     private DatagramSocket udpServer;
     private long timeoutms;
-    
+
     private short lastServerMsg = 0;
     private short currentMsgSeq = 0;
 
@@ -93,7 +96,7 @@ public class UDPClientService {
     }
 
     public List<ActorObject> getActors() {
-        return actors;
+        return new ArrayList<ActorObject>(actors.values());
     }
 
     @Override
@@ -134,7 +137,7 @@ public class UDPClientService {
                     messageParser.setFullMsg(buffer);
 
                     final Message parse = messageParser.parse();
-                    
+
                     if (parse != null && isUpdatedMsg(messageParser.getMessageSeq())) {
                         load(parse);
                     } else {
@@ -155,13 +158,13 @@ public class UDPClientService {
                 ex.printStackTrace(System.out);
             }
         }
-        
+
         private boolean isUpdatedMsg(short msgSeq) {
             boolean rs = false;
-           
-           if (lastServerMsg < msgSeq) {
+
+            if (lastServerMsg < msgSeq) {
                 rs = true;
-            } else if (lastServerMsg > 31910 && msgSeq < 10) {
+            } else if (lastServerMsg > 31000 && msgSeq < 1000) {
                 rs = true;
             }
 
@@ -176,9 +179,8 @@ public class UDPClientService {
             lastReceivedMessage = System.currentTimeMillis();
 
             if (parse instanceof StatusMessage) {
-                actors = new ArrayList<ActorObject>();
                 StatusMessage status = (StatusMessage) parse;
-                actors.addAll(status.getObjects());
+                updateActors(status.getObjects());
                 control.getActor().setPosition(status.getCurrentPlayer().getPosition());
                 control.getActor().setDirection(status.getCurrentPlayer().getDirection());
                 connected = true;
@@ -186,6 +188,35 @@ public class UDPClientService {
                 connected = false;
             }
 
+        }
+
+        private void updateActors(Collection<ActorObject> objects) {
+            final List<Short> foundActors = new ArrayList<Short>();
+            for (ActorObject act : objects) {
+                ActorObject or = null;
+
+                if (actors.containsKey(act.getuID())) {
+                    or = actors.get(act.getuID());
+                } else {
+                    or = act;
+                    actors.put(or.getuID(), act);
+                }
+
+                or.setDirection(act.getDirection());
+                or.setPosition(act.getPosition());
+                or.setVelocity(act.getVelocity());
+                foundActors.add(or.getuID());
+            }
+
+            System.out.println("MapSize:" + actors.size());
+            
+            for (Short t : actors.keySet()) {
+                if (!foundActors.contains(t)) {
+                    actors.remove(t);
+                }
+            }
+
+            System.out.println("MapSize:" + actors.size());
         }
 
     }
@@ -208,7 +239,7 @@ public class UDPClientService {
                     Message pool = null;
                     while ((pool = messages.peek()) != null && !stopped) {
                         messageParser.setMessageSeq(getNextMessageSeq());
-                        System.out.println("Using msgseq: "+messageParser.getMessageSeq());
+                        System.out.println("Using msgseq: " + messageParser.getMessageSeq());
                         byte[] sendData = messageParser.build(pool);
                         DatagramPacket sendPacket = new DatagramPacket(
                                 sendData, sendData.length, serverAddr, UDP_SERVER_PORT);
@@ -233,14 +264,13 @@ public class UDPClientService {
         }
 
         private short getNextMessageSeq() {
-            
-            if(currentMsgSeq > 32000){
+
+            if (currentMsgSeq > 32000) {
                 currentMsgSeq = 0;
             }
-            
+
             return currentMsgSeq++;
 
-            
         }
 
     }

@@ -96,7 +96,7 @@ public class BasicGameScreen implements GameScreenState {
         player2.setPosition(new Vector2(-200, -200));
         playerControl = service.insert(player);
 
-        for (int i = 1; i < 50; i++) {
+        for (int i = 1; i < 5; i++) {
             Planet p = new Planet();
             p.setPosition(new Vector2(500 * i, 150 * i));
             service.insertPlanet(p);
@@ -145,14 +145,12 @@ public class BasicGameScreen implements GameScreenState {
         render.render(baseMap);
 
         batch.begin();
-        System.out.println("Printing actors: " + service.getActors().size());
         for (ActorObject obj : service.getActors()) {
 
             final Vector2 position = obj.getPosition(); // that's the box's center position
 
             final float angle = obj.getAngle();
 
-//            System.out.println("position: " + position + ", angle: " + angle + ", size: " + obj.getSize());
             final TextureRegion texture = obj.getTexture();
             if (texture != null) {
 

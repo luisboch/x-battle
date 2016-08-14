@@ -24,7 +24,7 @@ public class Explosion extends ActorObject {
     private float currentForce;
     private long creationTime = System.currentTimeMillis();
     private boolean alive = true;
-    private float timeToAlive = 1.5f; //seconds
+    private float timeToAlive = 2f; //seconds
     private float stateTime;
 
     public Explosion() {
@@ -46,7 +46,6 @@ public class Explosion extends ActorObject {
     public void tick() {
         final Long aliveTime = System.currentTimeMillis() - creationTime;
         float percent = 1 - (aliveTime.floatValue() / 1000f) / timeToAlive;
-
         currentForce = force * percent;
 
         alive = currentForce > 1;
@@ -60,48 +59,49 @@ public class Explosion extends ActorObject {
 
         Array<TextureRegion> textures = new Array<TextureRegion>();
 
-        textures.add(split[0][0]);
-        textures.add(split[0][1]);
-        textures.add(split[0][2]);
-        textures.add(split[0][3]);
-        textures.add(split[0][4]);
-        textures.add(split[0][5]);
-        textures.add(split[0][6]);
-        textures.add(split[0][7]);
-        textures.add(split[0][8]);
-        textures.add(split[0][9]);
+        textures.add(split[0][0]); // 1
+        textures.add(split[0][1]); // 2
+        textures.add(split[0][2]); // 3
+        textures.add(split[0][3]); // 4
+        textures.add(split[0][4]); // 5
+        textures.add(split[0][5]); // 6
+        textures.add(split[0][6]); // 7
+        textures.add(split[0][7]); // 8
+        textures.add(split[0][8]); // 9
+        textures.add(split[0][9]); // 10
 
-        textures.add(split[1][0]);
-        textures.add(split[1][1]);
-        textures.add(split[1][2]);
-        textures.add(split[1][3]);
-        textures.add(split[1][4]);
-        textures.add(split[1][5]);
-        textures.add(split[1][6]);
-        textures.add(split[1][7]);
-        textures.add(split[1][8]);
-        textures.add(split[1][9]);
+        textures.add(split[1][0]); // 11
+        textures.add(split[1][1]); // 12
+        textures.add(split[1][2]); // 13
+        textures.add(split[1][3]); // 14
+        textures.add(split[1][4]); // 15
+        textures.add(split[1][5]); // 16
+        textures.add(split[1][6]); // 17
+        textures.add(split[1][7]); // 18
+        textures.add(split[1][8]); // 19
+        textures.add(split[1][9]); // 20
 
-        textures.add(split[2][0]);
-        textures.add(split[2][1]);
-        textures.add(split[2][2]);
-        textures.add(split[2][3]);
-        textures.add(split[2][4]);
-        textures.add(split[2][5]);
-        textures.add(split[2][6]);
-        textures.add(split[2][7]);
-        textures.add(split[2][8]);
-        textures.add(split[2][9]);
+        textures.add(split[2][0]); // 21
+        textures.add(split[2][1]); // 22
+        textures.add(split[2][2]); // 23
+        textures.add(split[2][3]); // 24
+        textures.add(split[2][4]); // 25
+        textures.add(split[2][5]); // 26
+        textures.add(split[2][6]); // 27
+        textures.add(split[2][7]); // 28
+        textures.add(split[2][8]); // 29
+        textures.add(split[2][9]); // 30
 
-        textures.add(split[3][0]);
-        textures.add(split[3][1]);
-        textures.add(split[3][2]);
-        textures.add(split[3][3]);
-        textures.add(split[3][4]);
-        textures.add(split[3][5]);
-        textures.add(split[3][6]);
+        textures.add(split[3][0]); // 31
+        textures.add(split[3][1]); // 32
+        textures.add(split[3][2]); // 33
+        textures.add(split[3][3]); // 34
+        textures.add(split[3][4]); // 35
+        textures.add(split[3][5]); // 36
+        textures.add(split[3][6]); // 37
 
-        animation = new Animation(0.1f, textures);
+        final float frame = timeToAlive / textures.size;
+        animation = new Animation(frame, textures);
 
         stateTime = 0;
     }
@@ -126,6 +126,16 @@ public class Explosion extends ActorObject {
 
     public void setCreationTime(long creationTime) {
         this.creationTime = creationTime;
+    }
+
+    @Override
+    public byte getAnnimationState() {
+        return ((Float)(stateTime * 10)).byteValue();
+    }
+
+    @Override
+    public void setAnnimationState(byte val) {
+       stateTime = ((Float)(new Float((float)val) / 10f));
     }
 
 }
