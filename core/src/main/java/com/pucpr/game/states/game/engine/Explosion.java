@@ -27,10 +27,13 @@ public class Explosion extends ActorObject {
     private float timeToAlive = 1.5f; //seconds
     private float stateTime;
 
+    public Explosion() {
+        this(new Vector2(2, 2), 0f, 0f);
+    }
+
     public Explosion(Vector2 position, float force, float radius) {
         super(radius, 1f, 150, 150);
         this.setPosition(position);
-        System.out.println("Expl:" + position);
         this.force = force;
         this.currentForce = force;
         loadAnnimation();

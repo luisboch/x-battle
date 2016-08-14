@@ -10,8 +10,8 @@ import com.pucpr.game.server.messages.MessageParser;
 import com.pucpr.game.server.messages.StatusMessage;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
-import com.pucpr.game.states.game.Player2;
 import com.pucpr.game.states.game.engine.ActorObject;
+import com.pucpr.game.states.game.engine.Shot;
 
 /**
  *
@@ -25,11 +25,13 @@ public class ProtocolTester {
         System.out.println("PROTOCOL TESTER: ");
         MessageParser fullMesg = new MessageParser();
         byte type = 3;
+        fullMesg.setMessageSeq((short) 32000);
         byte[] connectBytes = fullMesg.build(new ConnectMessage(type));
 
         fullMesg.setFullMsg(connectBytes);
+
         final ConnectMessage connectMessage = (ConnectMessage) fullMesg.parse();
-        if (connectMessage == null || !connectMessage.isValid() || connectMessage.getType() != type) {
+        if (connectMessage == null || !connectMessage.isValid() || connectMessage.getType() != type || fullMesg.getMessageSeq() != 32000) {
             throw new IllegalStateException("Connect test failed!");
         } else {
             System.out.println("Connect test:\t\tsuccess!");
@@ -72,15 +74,15 @@ public class ProtocolTester {
         p.setPosition(new Vector2(200, 100));
         p.setDirection(new Vector2(54, 19).rotate(90));
 
-        Player2 p2 = new Player2();
-        p2.setPosition(new Vector2(100, 100));
-        p2.setDirection(new Vector2(54, 19).rotate(180));
+        Shot sh = new Shot();
+        sh.setPosition(new Vector2(100, 100));
+        sh.setDirection(new Vector2(54, 19).rotate(180));
 
         Planet pl = new Planet();
         pl.setPosition(new Vector2(-200, 100));
         pl.setDirection(new Vector2(54, 19));
 
-        status.setCurrentPlayer(p).add(p2).add(pl);
+        status.setCurrentPlayer(p).add(sh).add(pl);
 
         byte[] statusBytes = fullMesg.build(status);
         fullMesg.setFullMsg(statusBytes);
@@ -93,8 +95,8 @@ public class ProtocolTester {
             for (ActorObject obj : status.getObjects()) {
                 if (obj instanceof Player) {
                     compare(obj, p);
-                } else if (obj instanceof Player2) {
-                    compare(obj, p2);
+                } else if (obj instanceof Shot) {
+                    compare(obj, sh);
                 } else if (obj instanceof Planet) {
                     compare(obj, pl);
                 }

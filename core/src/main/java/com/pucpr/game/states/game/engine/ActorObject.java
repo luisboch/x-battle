@@ -18,8 +18,8 @@ import com.pucpr.game.states.game.engine.steering.Steering;
  */
 public abstract class ActorObject {
 
-    private long uID = UIDManager.next(this);
-    
+    private short uID = UIDManager.next(this);
+
     private final float radius;
     private final float mass;
     private final float maxVel;
@@ -70,11 +70,11 @@ public abstract class ActorObject {
         this.type = _getType();
     }
 
-    public long getuID() {
+    public short getuID() {
         return uID;
     }
 
-    public void setuID(long uID) {
+    public void setuID(short uID) {
         this.uID = uID;
     }
 
@@ -139,7 +139,9 @@ public abstract class ActorObject {
 
     public void setSteering(Steering steering) {
         this.steering = steering;
-        steering.from(this);
+        if (steering != null) {
+            steering.from(this);
+        }
     }
 
     public Steering getSteering() {

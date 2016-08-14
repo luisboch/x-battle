@@ -13,7 +13,7 @@ import com.pucpr.game.states.game.engine.ActorObject;
  */
 public class UIDManager {
 
-    private static long nextUID = 0;
+    private static short nextUID = 0;
 
     /**
      * Create a new valid id, set to given object and, finally, return the id
@@ -21,7 +21,7 @@ public class UIDManager {
      * @param object
      * @return
      */
-    public static synchronized long next(ActorObject object) {
+    public static synchronized short next(ActorObject object) {
 
         if (object == null) {
             throw new IllegalStateException("Object can't be null");

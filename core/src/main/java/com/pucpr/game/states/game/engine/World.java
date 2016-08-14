@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.server.ActorControl;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
-import com.pucpr.game.states.game.Player2;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,7 +86,6 @@ public class World {
 
         final List<Class<? extends ActorObject>> allowedTypes = new ArrayList<Class<? extends ActorObject>>(2);
         allowedTypes.add(Player.class);
-        allowedTypes.add(Player2.class);
 
         return getClosestActor(center, viewSize, allowedTypes, new ArrayList<ActorObject>());
     }
@@ -105,7 +103,6 @@ public class World {
         if (allowedTypes == null) {
             allowedTypes = new ArrayList<Class<? extends ActorObject>>(2);
             allowedTypes.add(Player.class);
-            allowedTypes.add(Player2.class);
         }
 
         ActorObject closest = null;

@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class StatusMessage extends Message {
 
-    private static final int SIZE_PER_EL = 13;
+    private static final int SIZE_PER_EL = 9;
 
     private boolean valid;
     private ActorObject currentPlayer;
@@ -57,43 +57,44 @@ public class StatusMessage extends Message {
          * 0 = type;<br>
          * 1 = first posX;<br>
          * 2 = second posX;<br>
-         * 3 = third posX;<br>
-         * 4 = four posX;<br>
-         * 5 = first posY;<br>
-         * 6 = second posY;<br>
-         * 7 = third posY;<br>
-         * 8 = four posY;<br>
-         * 9 = first angle;<br>
-         * 10 = second angle;<br>
-         * 11 = third angle;<br>
-         * 12 = four angle;<br>
+         * 3 = first posY;<br>
+         * 4 = second posY;<br>
+         * 5 = first angle;<br>
+         * 6 = second angle;<br>
+         * 7 = first uid;<br>
+         * 8 = second uid;<br>
          */
-        byte[] data = new byte[objects.size() * SIZE_PER_EL + SIZE_PER_EL]; // we will use 10 bytes for each element + current player
+        byte[] data = new byte[objects.size() * SIZE_PER_EL + SIZE_PER_EL]; // we will use 7 bytes for each element + current player
 
         int idx = 0;
 
         data[idx] = getType(currentPlayer);
         idx++;
-        add(buildBytes((int) currentPlayer.getPosition().x), data, idx);
-        idx += 4;
-        add(buildBytes((int) currentPlayer.getPosition().y), data, idx);
-        idx += 4;
+        add(shortToByte((short) currentPlayer.getPosition().x), data, idx);
+        idx += INT_BYTE_SIZE;
+        add(shortToByte((short) currentPlayer.getPosition().y), data, idx);
+        idx += INT_BYTE_SIZE;
         int angle = (int) currentPlayer.getDirection().angle();
-        byte[] angleBytes = buildBytes(angle);
+        byte[] angleBytes = shortToByte((short) angle);
+        byte[] uidb = shortToByte(currentPlayer.getuID());
 
         add(angleBytes, data, idx);
+        idx += INT_BYTE_SIZE;
 
-        idx += 4;
+        add(uidb, data, idx);
+        idx += INT_BYTE_SIZE;
 
         for (ActorObject act : objects.keySet()) {
             data[idx] = objects.get(act);
             idx++;
-            add(buildBytes((int) act.getPosition().x), data, idx);
-            idx += 4;
-            add(buildBytes((int) act.getPosition().y), data, idx);
-            idx += 4;
-            add(buildBytes((int) act.getDirection().angle()), data, idx);
-            idx += 4;
+            add(shortToByte((short) act.getPosition().x), data, idx);
+            idx += INT_BYTE_SIZE;
+            add(shortToByte((short) act.getPosition().y), data, idx);
+            idx += INT_BYTE_SIZE;
+            add(shortToByte((short) act.getDirection().angle()), data, idx);
+            idx += INT_BYTE_SIZE;
+            add(shortToByte(act.getuID()), data, idx);
+            idx += INT_BYTE_SIZE;
         }
         return data;
     }
@@ -115,25 +116,26 @@ public class StatusMessage extends Message {
              * 0 = type;<br>
              * 1 = first posX;<br>
              * 2 = second posX;<br>
-             * 3 = third posX;<br>
-             * 4 = first posY;<br>
-             * 5 = second posY;<br>
-             * 6 = third posY;<br>
-             * 7 = first angle;<br>
-             * 8 = second angle;<br>
-             * 9 = third angle;<br>
+             * 3 = first posY;<br>
+             * 4 = second posY;<br>
+             * 5 = first angle;<br>
+             * 6 = second angle;<br>
+             * 7 = first uid;<br>
+             * 8 = second uid;<br>
              */
             int idx = loop;
 
             byte type = messageData[idx++];
 
-            byte[] posX = new byte[]{messageData[idx++], messageData[idx++], messageData[idx++], messageData[idx++]};
+            byte[] posX = new byte[]{messageData[idx++], messageData[idx++]};
 
-            byte[] posY = new byte[]{messageData[idx++], messageData[idx++], messageData[idx++], messageData[idx++]};
+            byte[] posY = new byte[]{messageData[idx++], messageData[idx++]};
 
-            byte[] angle = new byte[]{messageData[idx++], messageData[idx++], messageData[idx++], messageData[idx++]};
+            byte[] angle = new byte[]{messageData[idx++], messageData[idx++]};
+            
+            byte[] uidb = new byte[]{messageData[idx++], messageData[idx++]};
 
-            final ActorObject actor = getActor(type, bytesToInt(posX), bytesToInt(posY), bytesToInt(angle));
+            final ActorObject actor = getActor(type, bytesToShort(posX), bytesToShort(posY), bytesToShort(angle), bytesToShort(uidb));
 
             if (actor != null) {
                 if (loop == 0) { // is first element? then it is the currentplayer

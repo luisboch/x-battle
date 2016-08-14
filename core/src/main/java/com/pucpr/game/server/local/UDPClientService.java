@@ -45,6 +45,9 @@ public class UDPClientService {
     private InetAddress serverAddr;
     private DatagramSocket udpServer;
     private long timeoutms;
+    
+    private short lastServerMsg = 0;
+    private short currentMsgSeq = 0;
 
     public UDPClientService(RemoteSevice service) {
         this.service = service;
@@ -131,7 +134,8 @@ public class UDPClientService {
                     messageParser.setFullMsg(buffer);
 
                     final Message parse = messageParser.parse();
-                    if (parse != null) {
+                    
+                    if (parse != null && isUpdatedMsg(messageParser.getMessageSeq())) {
                         load(parse);
                     } else {
                         System.out.println("Packet ignored (invalid) ");
@@ -150,6 +154,22 @@ public class UDPClientService {
             } catch (Exception ex) {
                 ex.printStackTrace(System.out);
             }
+        }
+        
+        private boolean isUpdatedMsg(short msgSeq) {
+            boolean rs = false;
+           
+           if (lastServerMsg < msgSeq) {
+                rs = true;
+            } else if (lastServerMsg > 31910 && msgSeq < 10) {
+                rs = true;
+            }
+
+            if (rs) {
+                lastServerMsg = msgSeq;
+            }
+
+            return rs;
         }
 
         private void load(Message parse) {
@@ -187,6 +207,8 @@ public class UDPClientService {
 
                     Message pool = null;
                     while ((pool = messages.peek()) != null && !stopped) {
+                        messageParser.setMessageSeq(getNextMessageSeq());
+                        System.out.println("Using msgseq: "+messageParser.getMessageSeq());
                         byte[] sendData = messageParser.build(pool);
                         DatagramPacket sendPacket = new DatagramPacket(
                                 sendData, sendData.length, serverAddr, UDP_SERVER_PORT);
@@ -194,7 +216,6 @@ public class UDPClientService {
                         messages.remove(pool);
                     }
 
-                    
                     long synchTime = System.currentTimeMillis() - start;
                     long waitTime = sendPckMs - synchTime;
 
@@ -209,6 +230,17 @@ public class UDPClientService {
             } catch (Exception ex) {
                 ex.printStackTrace(System.out);
             }
+        }
+
+        private short getNextMessageSeq() {
+            
+            if(currentMsgSeq > 32000){
+                currentMsgSeq = 0;
+            }
+            
+            return currentMsgSeq++;
+
+            
         }
 
     }

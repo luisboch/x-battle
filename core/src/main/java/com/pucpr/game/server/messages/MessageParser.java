@@ -3,8 +3,6 @@
  */
 package com.pucpr.game.server.messages;
 
-import java.nio.ByteBuffer;
-
 /**
  *
  * @author Luis Boch
@@ -15,6 +13,8 @@ public class MessageParser {
 
     private byte protocol;
     private byte messageType;
+    private short messageSeq;
+    private static final int HEADER_LENGHT = 6;
     private byte[] messageData;
     private byte[] fullMsg;
 
@@ -32,23 +32,23 @@ public class MessageParser {
         }
 
         int idx = 0;
-        int size = Message.bytesToInt(new byte[]{fullMsg[idx++], fullMsg[idx++],
-            fullMsg[idx++], fullMsg[idx++]});
+        int size = Message.bytesToShort(new byte[]{fullMsg[idx++], fullMsg[idx++]});
+        messageSeq = (short) Message.bytesToShort(new byte[]{fullMsg[idx++], fullMsg[idx++]});
 
         if (size <= fullMsg.length) {
             protocol = fullMsg[idx++];
             messageType = fullMsg[idx++];
 
-            if (fullMsg.length > 6) {
+            if (fullMsg.length > HEADER_LENGHT) {
                 byte[] fixedMsg = new byte[size];
                 cpy(fullMsg, fixedMsg);
 
-                messageData = sub(6, 0, fixedMsg);
+                messageData = sub(HEADER_LENGHT, 0, fixedMsg);
             }
 
             Message message = getMessage(messageType, messageData);
             message.parse();
-            
+
             return message.isValid() ? message : null;
         }
 
@@ -60,14 +60,20 @@ public class MessageParser {
 
         protocol = Message.CURRENT_PROTOCOL;
         messageType = (byte) Message.MessageType.get((Class<Message>) message.getClass()).getKey();
+
         messageData = message.build();
 
-        byte[] result = new byte[6 + messageData.length];// Allocate protocol, type, and, at end, the lenght.;
-        byte[] messageLength = Message.intToByte(result.length);
+        byte[] result = new byte[HEADER_LENGHT + messageData.length];// Allocate protocol, type, and, at end, the lenght.;
+        byte[] messageLength = Message.shortToByte((short) result.length);
+        byte[] messageSeq = Message.shortToByte(this.messageSeq);
 
         int idx = 0;
         for (int i = 0; i < messageLength.length; i++) {
             result[idx++] = messageLength[i];
+        }
+
+        for (int i = 0; i < messageSeq.length; i++) {
+            result[idx++] = messageSeq[i];
         }
 
         result[idx++] = protocol;
@@ -111,6 +117,14 @@ public class MessageParser {
         }
 
         throw new IllegalArgumentException("The message type is unknow!");
+    }
+
+    public short getMessageSeq() {
+        return messageSeq;
+    }
+
+    public void setMessageSeq(short messageSeq) {
+        this.messageSeq = messageSeq;
     }
 
 }

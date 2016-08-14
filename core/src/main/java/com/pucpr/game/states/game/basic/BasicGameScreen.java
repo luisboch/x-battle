@@ -100,7 +100,7 @@ public class BasicGameScreen implements GameScreenState {
             Planet p = new Planet();
             p.setPosition(new Vector2(500 * i, 150 * i));
             service.insertPlanet(p);
-            
+
         }
     }
 
@@ -145,7 +145,7 @@ public class BasicGameScreen implements GameScreenState {
         render.render(baseMap);
 
         batch.begin();
-
+        System.out.println("Printing actors: " + service.getActors().size());
         for (ActorObject obj : service.getActors()) {
 
             final Vector2 position = obj.getPosition(); // that's the box's center position
@@ -160,7 +160,6 @@ public class BasicGameScreen implements GameScreenState {
                 sprite.setPosition(position.x - (sprite.getWidth() / 2), position.y - (sprite.getHeight() / 2));
                 sprite.setRotation(angle);
                 sprite.setScale(obj.getSize().x / sprite.getWidth(), obj.getSize().y / sprite.getHeight());
-
                 sprite.draw(batch);
             }
         }
@@ -201,13 +200,13 @@ public class BasicGameScreen implements GameScreenState {
         } else {
             playerControl.setAction1(false);
         }
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) {
             playerControl.setAction2(true);
         } else {
             playerControl.setAction2(false);
         }
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
             playerControl.setAction3(true);
         } else {

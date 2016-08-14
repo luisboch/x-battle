@@ -16,7 +16,6 @@ import com.pucpr.game.states.game.engine.World;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -137,7 +136,7 @@ public class UDPServerService {
 
                     final Message parse = messageParser.parse();
                     if (parse != null) {
-                        load(receivePacket.getAddress(), parse);
+                        load(receivePacket.getAddress(), parse, messageParser.getMessageSeq());
                     } else {
                         System.out.println("Packet ignored (invalid) ");
                     }
@@ -149,7 +148,7 @@ public class UDPServerService {
             }
         }
 
-        private void load(InetAddress address, Message msg) {
+        private void load(InetAddress address, Message msg, short msgSeq) {
             ClientInfo info = null;
             if (msg instanceof ConnectMessage) {
 
@@ -161,6 +160,8 @@ public class UDPServerService {
 
                     info.object = world.create(actor);
                     info.addr = address;
+                    info.lastMessageSeq = msgSeq;
+                    info.viewSize = connect.getScreenLimit();
 
                     clients.put(address, info);
 
@@ -171,7 +172,7 @@ public class UDPServerService {
             } else {
 
                 info = clients.get(address);
-                if (info != null) {
+                if (info != null && isUpdatedMsg(info, msgSeq)) {
                     if (msg instanceof CommandMessage) {
                         CommandMessage cmd = (CommandMessage) msg;
                         info.object.setUp(cmd.isUP());
@@ -196,6 +197,23 @@ public class UDPServerService {
             }
         }
 
+        private boolean isUpdatedMsg(ClientInfo info, short msgSeq) {
+            boolean rs = false;
+            if (info == null) {
+                rs = false;
+            } else if (info.lastMessageSeq < msgSeq) {
+                rs = true;
+            } else if (info.lastMessageSeq > 31910 && msgSeq < 10) {
+                rs = true;
+            }
+
+            if (rs) {
+                info.lastMessageSeq = msgSeq;
+            }
+
+            return rs;
+        }
+
     }
 
     private class SenderProcessor extends Thread {
@@ -214,6 +232,8 @@ public class UDPServerService {
 
                     ClientMesg pool = null;
                     while ((pool = messages.peek()) != null && !stopped) {
+                        messageParser.setMessageSeq(getNextMessageSeq(pool.addr));
+                        System.out.println("Using msgseq: "+messageParser.getMessageSeq());
                         byte[] sendData = messageParser.build(pool.msg);
                         DatagramPacket sendPacket = new DatagramPacket(
                                 sendData, sendData.length, pool.addr, UDP_CLIENT_PORT);
@@ -224,7 +244,7 @@ public class UDPServerService {
                     // All times add status msg
                     for (ClientInfo c : clients.values()) {
                         final StatusMessage msg = new StatusMessage();
-                        final List<ActorObject> objs = world.getVisibleActors(c.object.getActor().getPosition(), 4000f);
+                        final List<ActorObject> objs = world.getVisibleActors(c.object.getActor().getPosition(), (float) c.viewSize);
                         msg.addAll(objs);
                         msg.setCurrentPlayer(c.object.getActor());
                         messages.offer(new ClientMesg(c.addr, msg));
@@ -242,6 +262,15 @@ public class UDPServerService {
             }
         }
 
+        private short getNextMessageSeq(InetAddress addr) {
+            final ClientInfo info = clients.get(addr);
+                    
+            if (info.messageSeq > 32000) {
+                info.messageSeq = 0;
+            }
+
+            return info.messageSeq++;
+        }
     }
 
     private static class ClientMesg {
@@ -264,5 +293,8 @@ public class UDPServerService {
         private InetAddress addr;
         private ActorControl object;
         private long lastReceivedMessage;
+        private short lastMessageSeq = -1;
+        private short messageSeq = 0;
+        private short viewSize;
     }
 }

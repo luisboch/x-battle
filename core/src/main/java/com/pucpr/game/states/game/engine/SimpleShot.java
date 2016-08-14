@@ -10,10 +10,15 @@ public class SimpleShot extends Projectile {
 
     protected ActorObject target;
 
+    // Created when receive update from network (ignore steering and from, it will be controled by server)
+    public SimpleShot() {
+        this(null, null);
+    }
+
     public SimpleShot(Steering steering, ActorObject from) {
         super("disasteroids/fire.png", 5, 3f, 600, 400, new Vector2(30, 15), 20f, 10000f, 15000);
         init(steering, from);
-        
+
     }
 
     private void init(Steering steering, ActorObject from) {

@@ -10,6 +10,11 @@ public class Shot extends SimpleShot {
     protected ActorObject target;
     protected int minProximity;
 
+    public Shot() {
+        super(null, null);
+    }
+
+    
     public Shot(Steering steering, ActorObject from, ActorObject target, int minProximity) {
         super(steering, from);
         init(target, minProximity);

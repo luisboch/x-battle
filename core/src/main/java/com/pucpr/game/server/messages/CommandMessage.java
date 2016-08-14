@@ -14,6 +14,7 @@ import java.util.Arrays;
  */
 public class CommandMessage extends Message {
 
+    private static final int MESSAGE_LENGHT = 6;
     /**
      * UP
      */
@@ -90,7 +91,7 @@ public class CommandMessage extends Message {
 
     @Override
     public void parse() {
-        if (messageData == null || messageData.length < 10) {
+        if (messageData == null || messageData.length < MESSAGE_LENGHT) {
             System.out.println("CommandMessage#parse: received invalid message: " + Arrays.toString(messageData));
             valid = false;
         } else {
@@ -133,10 +134,10 @@ public class CommandMessage extends Message {
         command7 = getBit(4, cmdb2);
 
         // MOUSE X
-        mouseX = (short) bytesToInt(message[2], message[3], message[4], message[5]);
+        mouseX = (short) bytesToShort(message[2], message[3]);
 
         // MOUSE Y
-        mouseY = (short) bytesToInt(message[6], message[7], message[8], message[9]);
+        mouseY = (short) bytesToShort(message[4], message[5]);
 
     }
 
@@ -146,7 +147,7 @@ public class CommandMessage extends Message {
      */
     @Override
     public byte[] build() {
-        byte[] result = new byte[10];
+        byte[] result = new byte[MESSAGE_LENGHT];
         StringBuilder builder = new StringBuilder();
 
         int idx = 0;
@@ -164,8 +165,8 @@ public class CommandMessage extends Message {
         builder.append(command7);
         result[idx++] = buildByte(builder.toString());
 
-        byte[] mouseXb = buildBytes(mouseX);
-        byte[] mouseYb = buildBytes(mouseY);
+        byte[] mouseXb = shortToByte(mouseX);
+        byte[] mouseYb = shortToByte(mouseY);
 
         add(mouseXb, result, idx);
         idx += mouseXb.length;
@@ -313,10 +314,10 @@ public class CommandMessage extends Message {
 
     @Override
     public String toString() {
-        return "CommandMessage{" + "command0=" + command0 + ", command1=" + command1 + 
-                ", command2=" + command2 + ", command3=" + command3 + ", command4=" + command4 + 
-                ", command5=" + command5 + ", command6=" + command6 + ", command7=" + command7 + 
-                ", mouseX=" + mouseX + ", mouseY=" + mouseY + ", valid=" + valid + '}';
+        return "CommandMessage{" + "command0=" + command0 + ", command1=" + command1
+                + ", command2=" + command2 + ", command3=" + command3 + ", command4=" + command4
+                + ", command5=" + command5 + ", command6=" + command6 + ", command7=" + command7
+                + ", mouseX=" + mouseX + ", mouseY=" + mouseY + ", valid=" + valid + '}';
     }
 
 }
