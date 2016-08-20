@@ -88,4 +88,9 @@ public abstract class Projectile extends ActorObject {
         return reloadTimeConfig;
     }
 
+    public void setInitialVelocity(float initialVelocity) {
+        this.initialVelocity = initialVelocity;
+    }
+    
+
 }

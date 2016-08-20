@@ -45,6 +45,7 @@ public class ResourceLoader {
         resources.get("sprites").add("data/image/ships/SR-91A.png");
         resources.get("sprites").add("data/image/ships/Su-51K in.png");
         resources.get("sprites").add("data/image/disasteroids/fire.png");
+        resources.get("sprites").add("data/image/disasteroids/fire2.png");
         resources.get("sprites").add("data/image/explosions/explosion1.png");
     }
 

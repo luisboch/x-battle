@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
 import com.pucpr.game.states.game.engine.Projectile;
+import com.pucpr.game.states.game.engine.PursuitShot;
 import com.pucpr.game.states.game.engine.Shot;
 import com.pucpr.game.states.game.engine.SimpleShot;
 import com.pucpr.game.states.game.engine.World;
@@ -64,7 +65,9 @@ public class Player extends ActorObject {
     }
 
     public Projectile action1(World w) {
-        return new SimpleShot(new ProjectileSteering(), this);
+        final SimpleShot shot = new SimpleShot(new ProjectileSteering(), this);
+        shot.setInitialVelocity(getVelocity().len() + 400);
+        return shot;
     }
 
     public Projectile action2(World w) {
@@ -80,11 +83,13 @@ public class Player extends ActorObject {
 
         if (other != null) {
             stg.add(new Pursuit(other), 100);
+
+            stg.add(new ProjectileSteering(), 100);
+
+            return new PursuitShot(stg, this, other, 100);
         }
-
-        stg.add(new ProjectileSteering(), 100);
-
-        return new Shot(stg, this, other, 100);
+        
+        return null;
     }
 
     public Class<? extends Projectile> getAction1Type() {

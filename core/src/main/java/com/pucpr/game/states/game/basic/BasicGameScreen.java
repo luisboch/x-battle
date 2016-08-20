@@ -93,12 +93,13 @@ public class BasicGameScreen implements GameScreenState {
         }
 
         playerControl = service.insert(player2);
-        player2.setPosition(new Vector2(-200, -200));
+        player2.setPosition(new Vector2(300, 300));
+        player.setPosition(new Vector2(400, 400));
         playerControl = service.insert(player);
 
         for (int i = 1; i < 5; i++) {
             Planet p = new Planet();
-            p.setPosition(new Vector2(500 * i, 150 * i));
+            p.setPosition(new Vector2(2000 * i, 1500 * i));
             service.insertPlanet(p);
 
         }

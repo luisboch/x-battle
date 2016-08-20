@@ -189,6 +189,31 @@ public class World {
                 final Vector2 velSec = obj.getVelocity().cpy().scl(secs);
                 obj.setPosition(obj.getPosition().add(velSec));
             }
+
+            if (obj.getPosition().x > width && obj.getVelocity().x > 0) {
+                final Vector2 vel = obj.getVelocity();
+                vel.x = -vel.x;
+                
+                obj.setVelocity(vel);
+            }
+            
+            if (obj.getPosition().x <  0 && obj.getVelocity().x < 0) {
+                final Vector2 vel = obj.getVelocity();
+                vel.x = -vel.x;
+                obj.setVelocity(vel);
+            }
+            
+            if (obj.getPosition().y > height && obj.getVelocity().y > 0) {
+                final Vector2 vel = obj.getVelocity();
+                vel.y = -vel.y;
+                obj.setVelocity(vel);
+            }
+            
+            if (obj.getPosition().y < 0 && obj.getVelocity().y < 0) {
+                final Vector2 vel = obj.getVelocity();
+                vel.y = -vel.y;
+                obj.setVelocity(vel);
+            }
         }
 
         for (Explosion ex : explosions) {
@@ -254,6 +279,7 @@ public class World {
     public ActorControl create(ActorObject actor) {
         ActorControl act = new ActorControl(actor);
         add(actor);
+        actor.setPosition(new Vector2(500, 500));
         actor.setVelocity(new Vector2(0.0001f, 0.0001f));
         actor.setDirection(actor.getVelocity().nor());
         bind(actor, act);

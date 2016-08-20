@@ -47,7 +47,7 @@ public class GameState implements AppState {
         stage.act(Gdx.graphics.getDeltaTime());
 
         if (!skipFrame) {
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            Gdx.gl.glClear(GL20.GL_COLOR_CLEAR_VALUE);
 
             if (nextGameScreen != null) {
 
