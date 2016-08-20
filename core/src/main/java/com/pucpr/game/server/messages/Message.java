@@ -8,6 +8,7 @@ import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
 import com.pucpr.game.states.game.engine.ActorObject;
 import com.pucpr.game.states.game.engine.Explosion;
+import com.pucpr.game.states.game.engine.PursuitShot;
 import com.pucpr.game.states.game.engine.Shot;
 import com.pucpr.game.states.game.engine.SimpleShot;
 import java.nio.ByteBuffer;
@@ -116,7 +117,7 @@ public abstract class Message {
             return 1;
         } else if (obj.getClass().equals(SimpleShot.class)) {
             return 2;
-        } else if (obj.getClass().equals(Shot.class)) {
+        } else if (obj.getClass().equals(PursuitShot.class)) {
             return 3;
         } else if (obj.getClass().equals(Explosion.class)) {
             return 4;
@@ -134,7 +135,7 @@ public abstract class Message {
         } else if (type == 2) {
             act = new SimpleShot();
         } else if (type == 3) {
-            act = new Shot();
+            act = new PursuitShot();
         } else if (type == 4) {
             act = new Explosion();
         } else if (type == 5) {

@@ -11,6 +11,7 @@ import com.pucpr.game.server.messages.StatusMessage;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
 import com.pucpr.game.states.game.engine.ActorObject;
+import com.pucpr.game.states.game.engine.PursuitShot;
 import com.pucpr.game.states.game.engine.Shot;
 
 /**
@@ -74,7 +75,7 @@ public class ProtocolTester {
         p.setPosition(new Vector2(200, 100));
         p.setDirection(new Vector2(54, 19).rotate(90));
 
-        Shot sh = new Shot();
+        PursuitShot sh = new PursuitShot();
         sh.setPosition(new Vector2(100, 100));
         sh.setDirection(new Vector2(54, 19).rotate(180));
 
@@ -95,7 +96,7 @@ public class ProtocolTester {
             for (ActorObject obj : status.getObjects()) {
                 if (obj instanceof Player) {
                     compare(obj, p);
-                } else if (obj instanceof Shot) {
+                } else if (obj instanceof PursuitShot) {
                     compare(obj, sh);
                 } else if (obj instanceof Planet) {
                     compare(obj, pl);
