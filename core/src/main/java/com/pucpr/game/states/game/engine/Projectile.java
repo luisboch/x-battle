@@ -43,7 +43,7 @@ public abstract class Projectile extends ActorObject {
     }
 
     @Override
-    public TextureRegion getTexture() {
+    protected TextureRegion getTexture() {
         return animation.getKeyFrame(0);
     }
 

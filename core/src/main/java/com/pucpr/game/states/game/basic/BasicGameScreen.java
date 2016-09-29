@@ -13,6 +13,7 @@ import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Matrix3;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -147,20 +148,7 @@ public class BasicGameScreen implements GameScreenState {
 
         batch.begin();
         for (ActorObject obj : service.getActors()) {
-
-            final Vector2 position = obj.getPosition(); // that's the box's center position
-
-            final float angle = obj.getAngle();
-
-            final TextureRegion texture = obj.getTexture();
-            if (texture != null) {
-
-                final Sprite sprite = new Sprite(texture);
-                sprite.setPosition(position.x - (sprite.getWidth() / 2), position.y - (sprite.getHeight() / 2));
-                sprite.setRotation(angle);
-                sprite.setScale(obj.getSize().x / sprite.getWidth(), obj.getSize().y / sprite.getHeight());
-                sprite.draw(batch);
-            }
+            obj.draw(batch, new Matrix3().idt());
         }
 
         batch.end();

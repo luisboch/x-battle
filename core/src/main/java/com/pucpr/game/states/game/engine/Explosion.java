@@ -107,7 +107,7 @@ public class Explosion extends ActorObject {
     }
 
     @Override
-    public TextureRegion getTexture() {
+    protected TextureRegion getTexture() {
         stateTime += Gdx.graphics.getDeltaTime();
         return animation.getKeyFrame(stateTime);
     }

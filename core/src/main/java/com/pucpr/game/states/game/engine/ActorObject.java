@@ -5,10 +5,14 @@ package com.pucpr.game.states.game.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.states.game.UIDManager;
 import com.pucpr.game.states.game.engine.steering.Steering;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -28,11 +32,15 @@ public abstract class ActorObject {
     private final Vector2 position = new Vector2();
     private final Vector2 velocity = new Vector2();
     private Vector2 direction = new Vector2();
+    private Vector2 lastWorldPos = new Vector2();
+    private Vector2 pivot = new Vector2(0f, 0f);
     private final Vector2 size; // Render used only
 
     private final String type;
 
     private Steering steering;
+
+    private List<ActorObject> listActorObject = new ArrayList<ActorObject>();
 
     public ActorObject(float radius, float mass, float width, float height) {
         this.radius = radius;
@@ -70,6 +78,51 @@ public abstract class ActorObject {
         this.type = _getType();
     }
 
+    protected abstract TextureRegion getTexture();
+    
+    protected void tick() {};
+
+    public Vector2 getLastWorldPos() {
+        return lastWorldPos;
+    }
+    
+    public void draw(SpriteBatch render, Matrix3 world) {
+        
+        tick();
+        
+        final float angle = this.getAngle();
+
+        final TextureRegion texture = this.getTexture();
+
+        world = new Matrix3(world).mul(new Matrix3().setToTranslation(this.getPosition()));
+        world.mul(new Matrix3().rotate(angle));
+        world.mul(new Matrix3().setToTranslation(getPivot().x, getPivot().y));
+
+        if (texture != null) {
+            lastWorldPos = new Vector2();
+
+            world.getTranslation(lastWorldPos);
+            final Sprite sprite = new Sprite(texture);
+
+            sprite.setPosition(lastWorldPos.x - (sprite.getWidth() / 2), lastWorldPos.y - (sprite.getHeight() / 2));
+            sprite.setRotation(angle);
+            sprite.setScale(this.getSize().x / sprite.getWidth(), this.getSize().y / sprite.getHeight());
+            sprite.draw(render);
+
+            for (ActorObject c : getListActorObject()) {
+                c.draw(render, world);
+            }
+        }
+    }
+
+    public Vector2 getPivot() {
+        return pivot;
+    }
+
+    public void setPivot(Vector2 pivot) {
+        this.pivot = pivot;
+    }
+    
     public short getuID() {
         return uID;
     }
@@ -148,8 +201,6 @@ public abstract class ActorObject {
         return steering;
     }
 
-    public abstract TextureRegion getTexture();
-
     public float getAngle() {
         return getDirection().angle();
     }
@@ -163,6 +214,14 @@ public abstract class ActorObject {
 
     public void setAnnimationState(byte val) {
         // Ignored...
+    }
+
+    public List<ActorObject> getListActorObject() {
+        return listActorObject;
+    }
+
+    public void setListActorObject(List<ActorObject> listActorObject) {
+        this.listActorObject = listActorObject;
     }
 
 }

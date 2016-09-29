@@ -9,9 +9,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  *
  * @author Luis Boch 
@@ -28,7 +25,7 @@ public class Planet extends ActorObject{
 
     
     @Override
-    public TextureRegion getTexture() {
+    protected TextureRegion getTexture() {
         return animation.getKeyFrame(0);
     }
     

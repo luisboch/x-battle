@@ -38,6 +38,17 @@ public class Player extends ActorObject {
     public Player() {
         super(25, 1f, 200, 50, 50);
         loadAnnimation();
+        ForceField f1 = new ForceField();
+        f1.getPivot().x = 70;
+        ForceField f2 = new ForceField();
+        f2.getPivot().x = 70;
+        f2.setDirection(f1.getDirection().rotate(360/3));
+        ForceField f3 = new ForceField();
+        f3.getPivot().x = 70;
+        f3.setDirection(f2.getDirection().rotate(360/3));
+        getListActorObject().add(f1);
+        getListActorObject().add(f2);
+        getListActorObject().add(f3);
     }
 
     private void loadAnnimation() {
@@ -56,7 +67,7 @@ public class Player extends ActorObject {
     }
 
     @Override
-    public TextureRegion getTexture() {
+    protected TextureRegion getTexture() {
         stateTime += Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             return animation.get(State.RUNNING).getKeyFrame(stateTime);

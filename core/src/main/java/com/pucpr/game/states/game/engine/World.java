@@ -10,6 +10,7 @@ import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,12 +124,24 @@ public class World {
         return closest;
     }
 
+    private void discoverActors(List<ActorObject> currentList, Collection<ActorObject> source) {
+
+        for (ActorObject obj : source) {
+            currentList.add(obj);
+            discoverActors(currentList, obj.getListActorObject());
+        }
+    }
+
     public void calculate() {
 
         removeDeadObjects();
 
         float secs = Gdx.app.getGraphics().getDeltaTime();
-        for (ActorObject obj : actors) {
+        final List<ActorObject> fullList = new ArrayList<ActorObject>();
+        
+        discoverActors(fullList, actors);
+        
+        for (ActorObject obj : fullList) {
             resolveImpact(obj);
 
             /**
@@ -193,22 +206,22 @@ public class World {
             if (obj.getPosition().x > width && obj.getVelocity().x > 0) {
                 final Vector2 vel = obj.getVelocity();
                 vel.x = -vel.x;
-                
+
                 obj.setVelocity(vel);
             }
-            
-            if (obj.getPosition().x <  0 && obj.getVelocity().x < 0) {
+
+            if (obj.getPosition().x < 0 && obj.getVelocity().x < 0) {
                 final Vector2 vel = obj.getVelocity();
                 vel.x = -vel.x;
                 obj.setVelocity(vel);
             }
-            
+
             if (obj.getPosition().y > height && obj.getVelocity().y > 0) {
                 final Vector2 vel = obj.getVelocity();
                 vel.y = -vel.y;
                 obj.setVelocity(vel);
             }
-            
+
             if (obj.getPosition().y < 0 && obj.getVelocity().y < 0) {
                 final Vector2 vel = obj.getVelocity();
                 vel.y = -vel.y;
@@ -399,7 +412,7 @@ public class World {
     private void resolveImpact(ActorObject ob) {
         for (ActorObject act : actors) {
             if (!ob.equals(act)
-                    && ob.getPosition().dst(act.getPosition()) <= (ob.getRadius() + act.getRadius())) {
+                    && ob.getLastWorldPos().dst(act.getLastWorldPos()) <= (ob.getRadius() + act.getRadius())) {
                 ob.contact(act);
             }
         }
