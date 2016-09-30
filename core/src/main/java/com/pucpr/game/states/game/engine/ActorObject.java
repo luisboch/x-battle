@@ -3,7 +3,6 @@
  */
 package com.pucpr.game.states.game.engine;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,7 +11,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.states.game.UIDManager;
 import com.pucpr.game.states.game.engine.steering.Steering;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  *
@@ -40,7 +41,8 @@ public abstract class ActorObject {
 
     private Steering steering;
 
-    private List<ActorObject> listActorObject = new ArrayList<ActorObject>();
+    private final List<ActorObject> listActorObject;
+    private ActorObject parent;
 
     public ActorObject(float radius, float mass, float width, float height) {
         this.radius = radius;
@@ -49,6 +51,7 @@ public abstract class ActorObject {
         maxVel = 500f;
         maxForce = 350f;
         size = new Vector2(width, height);
+        listActorObject = new ControlList(this);
     }
 
     public ActorObject(float radius, float mass, float maxVel, float width, float height) {
@@ -58,6 +61,7 @@ public abstract class ActorObject {
         this.maxVel = maxVel;
         maxForce = 350f;
         this.size = new Vector2(width, height);
+        listActorObject = new ControlList(this);
     }
 
     public ActorObject(float radius, float mass, float maxVel, float maxForce, float width, float height) {
@@ -67,6 +71,7 @@ public abstract class ActorObject {
         this.maxVel = maxVel;
         this.maxForce = maxForce;
         this.size = new Vector2(width, height);
+        listActorObject = new ControlList(this);
     }
 
     public ActorObject(float radius, float mass, float maxVel, float maxForce, Vector2 size) {
@@ -76,20 +81,24 @@ public abstract class ActorObject {
         this.maxForce = maxForce;
         this.size = size;
         this.type = _getType();
+        listActorObject = new ControlList(this);
     }
 
     protected abstract TextureRegion getTexture();
-    
-    protected void tick() {};
+
+    protected void tick() {
+    }
+
+    ;
 
     public Vector2 getLastWorldPos() {
         return lastWorldPos;
     }
-    
+
     public void draw(SpriteBatch render, Matrix3 world) {
-        
+
         tick();
-        
+
         final float angle = this.getAngle();
 
         final TextureRegion texture = this.getTexture();
@@ -122,7 +131,7 @@ public abstract class ActorObject {
     public void setPivot(Vector2 pivot) {
         this.pivot = pivot;
     }
-    
+
     public short getuID() {
         return uID;
     }
@@ -221,7 +230,92 @@ public abstract class ActorObject {
     }
 
     public void setListActorObject(List<ActorObject> listActorObject) {
-        this.listActorObject = listActorObject;
+        this.listActorObject.clear();
+        this.listActorObject.addAll(listActorObject);
+    }
+
+    public void setParent(ActorObject parent) {
+        this.parent = parent;
+    }
+
+    public ActorObject getParent() {
+        return parent;
+    }
+
+    
+    private static class ControlList extends ArrayList<ActorObject> {
+
+        private final ActorObject _instance;
+
+        private ControlList(ActorObject ref) {
+            _instance = ref;
+        }
+
+        @Override
+        public boolean add(ActorObject e) {
+            if (e == null) {
+                return false;
+            }
+
+            e.setParent(_instance);
+            return super.add(e);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends ActorObject> c) {
+
+            if (c == null) {
+                return false;
+            }
+
+            for (ActorObject a : c) {
+                if (a != null) {
+                    a.setParent(_instance);
+                }
+            }
+            return super.addAll(c);
+        }
+
+        @Override
+        public void clear() {
+
+            for (ActorObject a : this) {
+                a.setParent(null);
+            }
+
+            super.clear();
+        }
+
+        @Override
+        public boolean remove(Object o) {
+
+            if (o == null) {
+                return false;
+            }
+
+            if (o instanceof ActorObject) {
+                ((ActorObject) o).setParent(null);
+            }
+
+            return super.remove(o);
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+
+            if (c == null) {
+                return false;
+            }
+
+            for (Object o : c) {
+                if (o instanceof ActorObject) {
+                    ((ActorObject) o).setParent(null);
+                }
+            }
+
+            return super.removeAll(c);
+        }
+
     }
 
 }

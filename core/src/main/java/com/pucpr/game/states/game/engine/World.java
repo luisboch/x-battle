@@ -6,6 +6,7 @@ package com.pucpr.game.states.game.engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.server.ActorControl;
+import com.pucpr.game.states.game.ForceField;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
 import java.util.ArrayList;
@@ -138,11 +139,12 @@ public class World {
 
         float secs = Gdx.app.getGraphics().getDeltaTime();
         final List<ActorObject> fullList = new ArrayList<ActorObject>();
-        
+
         discoverActors(fullList, actors);
-        
+
         for (ActorObject obj : fullList) {
-            resolveImpact(obj);
+            
+            resolveImpact(obj, fullList);
 
             /**
              * Primeiro calcula as forças.<br>
@@ -357,7 +359,7 @@ public class World {
         projectile.setPosition(pos);
         projectile.setDirection(from.getDirection());
         projectile.setVelocity(from.getDirection().nor().scl(projectile.getInitialVelocity()));
-
+        
         projectiles.put(projectile, System.currentTimeMillis());
         actors.add(projectile);
     }
@@ -409,8 +411,9 @@ public class World {
         deadObjects.add(p);
     }
 
-    private void resolveImpact(ActorObject ob) {
+    private void resolveImpact(ActorObject ob, List<ActorObject> actors) {
         for (ActorObject act : actors) {
+           
             if (!ob.equals(act)
                     && ob.getLastWorldPos().dst(act.getLastWorldPos()) <= (ob.getRadius() + act.getRadius())) {
                 ob.contact(act);

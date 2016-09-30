@@ -16,13 +16,13 @@ import java.util.Map;
  * @author luis
  */
 public abstract class Projectile extends ActorObject {
-    
+
     private static Map<Class<? extends Projectile>, Float> reloadTimeConfig = new HashMap<Class<? extends Projectile>, Float>();
+
     static {
         reloadTimeConfig.put(Shot.class, 500f);
         reloadTimeConfig.put(SimpleShot.class, 300f);
-        
-        
+
     }
     private Animation animation;
     protected float explosionRadius = 100;
@@ -79,7 +79,7 @@ public abstract class Projectile extends ActorObject {
     public void contact(ActorObject e) {
 
         super.contact(e);
-        if (e != null && from != null && !from.equals(e) && !(e instanceof Explosion)) {
+        if (e != null && from != null && !from.equals(e) && (e.getParent() == null || e.getParent() != from) && !(e instanceof Explosion)) {
             canExplode = true;
         }
     }
@@ -91,6 +91,5 @@ public abstract class Projectile extends ActorObject {
     public void setInitialVelocity(float initialVelocity) {
         this.initialVelocity = initialVelocity;
     }
-    
 
 }
