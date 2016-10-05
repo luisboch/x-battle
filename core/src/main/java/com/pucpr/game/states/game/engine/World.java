@@ -45,13 +45,32 @@ public class World {
     private final float width;
     private final float height;
 
-    public World(float width, float height) {
+    private final float margin;
+
+    public World(float width, float height, float margin) {
         this.width = width;
         this.height = height;
+        this.margin = margin;
     }
 
     public World add(ActorObject actor) {
+        Vector2 pos = actor.getPosition();
+        if (pos.y < height - margin) {
+            pos.y = height - margin;
+        } else if (pos.y > height + margin) {
+            pos.y = height + margin;
+        }
+
+        if (pos.x < width - margin) {
+            pos.x = width - margin;
+        } else if (pos.x > width + margin) {
+            pos.y = width + margin;
+        }
+
+        actor.setPosition(pos);
+
         actors.add(actor);
+
         return this;
     }
 
@@ -143,7 +162,7 @@ public class World {
         discoverActors(fullList, actors);
 
         for (ActorObject obj : fullList) {
-            
+
             resolveImpact(obj, fullList);
 
             /**
@@ -205,29 +224,30 @@ public class World {
                 obj.setPosition(obj.getPosition().add(velSec));
             }
 
-            if (obj.getPosition().x > width && obj.getVelocity().x > 0) {
-                final Vector2 vel = obj.getVelocity();
-                vel.x = -vel.x;
+            if (obj instanceof Player) {
+                if (obj.getPosition().x > (width + margin) && obj.getVelocity().x > 0) {
+                    final Vector2 vel = obj.getVelocity();
+                    vel.x = -vel.x;
+                    obj.setVelocity(vel);
+                }
 
-                obj.setVelocity(vel);
-            }
+                if (obj.getPosition().x < margin && obj.getVelocity().x < 0) {
+                    final Vector2 vel = obj.getVelocity();
+                    vel.x = -vel.x;
+                    obj.setVelocity(vel);
+                }
 
-            if (obj.getPosition().x < 0 && obj.getVelocity().x < 0) {
-                final Vector2 vel = obj.getVelocity();
-                vel.x = -vel.x;
-                obj.setVelocity(vel);
-            }
+                if (obj.getPosition().y > (height + margin) && obj.getVelocity().y > 0) {
+                    final Vector2 vel = obj.getVelocity();
+                    vel.y = -vel.y;
+                    obj.setVelocity(vel);
+                }
 
-            if (obj.getPosition().y > height && obj.getVelocity().y > 0) {
-                final Vector2 vel = obj.getVelocity();
-                vel.y = -vel.y;
-                obj.setVelocity(vel);
-            }
-
-            if (obj.getPosition().y < 0 && obj.getVelocity().y < 0) {
-                final Vector2 vel = obj.getVelocity();
-                vel.y = -vel.y;
-                obj.setVelocity(vel);
+                if (obj.getPosition().y < margin && obj.getVelocity().y < 0) {
+                    final Vector2 vel = obj.getVelocity();
+                    vel.y = -vel.y;
+                    obj.setVelocity(vel);
+                }
             }
         }
 
@@ -247,31 +267,35 @@ public class World {
     private Vector2 calculateForceInfluence(ActorObject objA) {
         final Vector2 result = new Vector2();
 
+        // Used to calculate how much we will hit obj.
+        final Vector2 expForce = new Vector2();
+
         if (planets.contains(objA)) {
             return result;
         }
+        if (!objA.getClass().equals(ForceField.class)) {
+            for (ActorObject pln : planets) {
 
-        for (ActorObject pln : planets) {
+                final Vector2 forceField = objA.getPosition().cpy().sub(pln.getPosition());
+                final float dist = forceField.len();
 
-            final Vector2 forceField = objA.getPosition().cpy().sub(pln.getPosition());
-            final float dist = forceField.len();
+                if (dist > 300) {
+                    continue; // Ignore objects that is too far away.
+                }
 
-            if (dist > 300) {
-                continue; // Ignore objects that is too far away.
+                final float intensity = objA.getMass() * pln.getMass();
+
+                final float distSqr = dist * dist;
+
+                forceField.nor();
+                forceField.scl(intensity / distSqr);
+                result.sub(forceField);
             }
-
-            final float intensity = objA.getMass() * pln.getMass();
-
-            final float distSqr = dist * dist;
-
-            forceField.nor();
-            forceField.scl(intensity / distSqr);
-            result.sub(forceField);
         }
 
         for (Explosion expl : explosions) {
 
-            final Vector2 forceField = objA.getPosition().cpy().sub(expl.getPosition());
+            final Vector2 forceField = objA.getLastWorldPos().cpy().sub(expl.getPosition());
             final float dist = forceField.len();
 
             if (dist > expl.getRadius() + objA.getRadius()) {
@@ -284,8 +308,15 @@ public class World {
 
             forceField.nor();
             forceField.scl(intensity / distSqr);
-            result.sub(forceField);
+
+            if (!objA.getClass().equals(ForceField.class)) {
+                result.sub(forceField);
+            }
+            
+            expForce.add(forceField);
         }
+
+        objA.applyForce(expForce.len());
 
         return result;
 
@@ -293,8 +324,8 @@ public class World {
 
     public ActorControl create(ActorObject actor) {
         ActorControl act = new ActorControl(actor);
-        add(actor);
         actor.setPosition(new Vector2(500, 500));
+        add(actor);
         actor.setVelocity(new Vector2(0.0001f, 0.0001f));
         actor.setDirection(actor.getVelocity().nor());
         bind(actor, act);
@@ -359,7 +390,7 @@ public class World {
         projectile.setPosition(pos);
         projectile.setDirection(from.getDirection());
         projectile.setVelocity(from.getDirection().nor().scl(projectile.getInitialVelocity()));
-        
+
         projectiles.put(projectile, System.currentTimeMillis());
         actors.add(projectile);
     }
@@ -412,9 +443,14 @@ public class World {
     }
 
     private void resolveImpact(ActorObject ob, List<ActorObject> actors) {
+
+        if (!ob.isAlive()) {
+            return;
+        }
+
         for (ActorObject act : actors) {
-           
-            if (!ob.equals(act)
+
+            if (!ob.equals(act) && act.isAlive()
                     && ob.getLastWorldPos().dst(act.getLastWorldPos()) <= (ob.getRadius() + act.getRadius())) {
                 ob.contact(act);
             }

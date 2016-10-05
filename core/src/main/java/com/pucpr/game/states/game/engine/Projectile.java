@@ -22,8 +22,8 @@ public abstract class Projectile extends ActorObject {
     static {
         reloadTimeConfig.put(Shot.class, 500f);
         reloadTimeConfig.put(SimpleShot.class, 300f);
-
     }
+    
     private Animation animation;
     protected float explosionRadius = 100;
     protected float explosionForce = 100000; // The force that this Projectile cause;

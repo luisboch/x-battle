@@ -93,8 +93,8 @@ public class BasicGameScreen implements GameScreenState {
             service = new RemoteSevice(GameConfig.serverHost);
         }
 
-        playerControl = service.insert(player2);
         player2.setPosition(new Vector2(300, 300));
+        playerControl = service.insert(player2);
         player.setPosition(new Vector2(400, 400));
         playerControl = service.insert(player);
 

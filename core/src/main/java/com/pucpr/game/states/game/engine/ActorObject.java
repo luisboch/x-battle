@@ -13,7 +13,6 @@ import com.pucpr.game.states.game.engine.steering.Steering;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  *
@@ -32,7 +31,7 @@ public abstract class ActorObject {
     private final float maxForce;
     private final Vector2 position = new Vector2();
     private final Vector2 velocity = new Vector2();
-    private Vector2 direction = new Vector2();
+    private final Vector2 direction = new Vector2();
     private Vector2 lastWorldPos = new Vector2();
     private Vector2 pivot = new Vector2(0f, 0f);
     private final Vector2 size; // Render used only
@@ -40,6 +39,8 @@ public abstract class ActorObject {
     private final String type;
 
     private Steering steering;
+
+    protected int health = -1;
 
     private final List<ActorObject> listActorObject;
     private ActorObject parent;
@@ -89,37 +90,59 @@ public abstract class ActorObject {
     protected void tick() {
     }
 
-    ;
-
     public Vector2 getLastWorldPos() {
         return lastWorldPos;
+    }
+
+    public void applyForce(Float force) {
+        if (this.health > 0) {
+
+            float f = force;
+
+            if (f > 0) {
+                float h = this.health;
+                h = h - f;
+                h = h < 0 ? 0 : h;
+
+                this.health = (int) h;
+
+                System.out.println("Remaining health: " + h);
+            }
+        }
+    }
+
+    public final void setHealth(Integer health) {
+        this.health = health;
     }
 
     public void draw(SpriteBatch render, Matrix3 world) {
 
         tick();
+        
+        if (isAlive()) {
+        
+            final float angle = this.getAngle();
 
-        final float angle = this.getAngle();
+            final TextureRegion texture = this.getTexture();
 
-        final TextureRegion texture = this.getTexture();
+            world = new Matrix3(world).mul(new Matrix3().setToTranslation(this.getPosition()));
+            world.mul(new Matrix3().rotate(angle));
+            world.mul(new Matrix3().setToTranslation(getPivot().x, getPivot().y));
 
-        world = new Matrix3(world).mul(new Matrix3().setToTranslation(this.getPosition()));
-        world.mul(new Matrix3().rotate(angle));
-        world.mul(new Matrix3().setToTranslation(getPivot().x, getPivot().y));
+            if (texture != null) {
+                lastWorldPos = new Vector2();
 
-        if (texture != null) {
-            lastWorldPos = new Vector2();
+                world.getTranslation(lastWorldPos);
+                final Sprite sprite = new Sprite(texture);
 
-            world.getTranslation(lastWorldPos);
-            final Sprite sprite = new Sprite(texture);
+                sprite.setPosition(lastWorldPos.x - (sprite.getWidth() / 2), lastWorldPos.y - (sprite.getHeight() / 2));
+                sprite.setRotation(angle);
+                sprite.setScale(this.getSize().x / sprite.getWidth(), this.getSize().y / sprite.getHeight());
+                sprite.draw(render);
 
-            sprite.setPosition(lastWorldPos.x - (sprite.getWidth() / 2), lastWorldPos.y - (sprite.getHeight() / 2));
-            sprite.setRotation(angle);
-            sprite.setScale(this.getSize().x / sprite.getWidth(), this.getSize().y / sprite.getHeight());
-            sprite.draw(render);
-
-            for (ActorObject c : getListActorObject()) {
-                c.draw(render, world);
+                for (ActorObject c : getListActorObject()) {
+                    c.draw(render, new Matrix3(world).mul(new Matrix3().rotate(-angle)));
+                }
             }
         }
     }
@@ -242,7 +265,6 @@ public abstract class ActorObject {
         return parent;
     }
 
-    
     private static class ControlList extends ArrayList<ActorObject> {
 
         private final ActorObject _instance;
@@ -316,6 +338,10 @@ public abstract class ActorObject {
             return super.removeAll(c);
         }
 
+    }
+
+    public boolean isAlive() {
+        return health == -1 || health > 0;
     }
 
 }

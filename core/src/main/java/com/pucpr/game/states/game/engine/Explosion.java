@@ -39,6 +39,7 @@ public class Explosion extends ActorObject {
         loadAnnimation();
     }
 
+    @Override
     public boolean isAlive() {
         return alive;
     }

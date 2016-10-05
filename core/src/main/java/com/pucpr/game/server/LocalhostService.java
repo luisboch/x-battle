@@ -22,8 +22,9 @@ public class LocalhostService extends GameService {
     private World world;
     private UDPServerService udpService;
     private static final int mapWidth = 100*32;
+    private static final int mapMargin = 100*16;
     public LocalhostService(){
-        world = new World(mapWidth, mapWidth);
+        world = new World(mapWidth, mapWidth, mapMargin);
         udpService = new UDPServerService(world, this);
     }
     

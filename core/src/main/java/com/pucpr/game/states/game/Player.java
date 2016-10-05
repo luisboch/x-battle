@@ -30,7 +30,9 @@ import java.util.Map;
  * @since Jul 31, 2016
  */
 public class Player extends ActorObject {
-
+    
+    private static final int INIT_HEALTH = 3000;
+    
     private final Map<State, Animation> animation = new HashMap<State, Animation>();
     private State state = State.IDLE;
     float stateTime;
@@ -45,10 +47,14 @@ public class Player extends ActorObject {
         f2.setDirection(f1.getDirection().rotate(360/3));
         ForceField f3 = new ForceField();
         f3.getPivot().x = 70;
+        
         f3.setDirection(f2.getDirection().rotate(360/3));
         getListActorObject().add(f1);
         getListActorObject().add(f2);
         getListActorObject().add(f3);
+        
+        // Create health
+        setHealth(INIT_HEALTH);
     }
 
     private void loadAnnimation() {

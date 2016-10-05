@@ -7,13 +7,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Matrix3;
-import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,6 +21,7 @@ import java.util.Map;
  */
 public class ForceField extends ActorObject {
 
+    private static final int INIT_HEALTH = 2000;
     private final Map<State, Animation> animation = new EnumMap<State, Animation>(State.class);
     private State state = State.IDLE;
     float stateTime;
@@ -32,6 +30,7 @@ public class ForceField extends ActorObject {
         super(25, 1f, 200, 50, 50);
         loadAnnimation();
         setDirection(new Vector2(0.0001f, 0.0001f));
+        setHealth(INIT_HEALTH);
     }
 
     private void loadAnnimation() {
@@ -56,6 +55,9 @@ public class ForceField extends ActorObject {
     @Override
     protected void tick() {
         setDirection(getDirection().nor().rotate(50f * Gdx.graphics.getDeltaTime()));
+        if (health < INIT_HEALTH) {
+            health += (50 * Gdx.graphics.getDeltaTime());
+        }
     }
 
 }
