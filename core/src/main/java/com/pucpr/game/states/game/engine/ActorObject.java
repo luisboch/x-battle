@@ -32,7 +32,7 @@ public abstract class ActorObject {
     private final Vector2 position = new Vector2();
     private final Vector2 velocity = new Vector2();
     private final Vector2 direction = new Vector2();
-    private Vector2 lastWorldPos = new Vector2();
+    protected Vector2 lastWorldPos = new Vector2();
     private Vector2 pivot = new Vector2(0f, 0f);
     private final Vector2 size; // Render used only
 

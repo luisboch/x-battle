@@ -18,6 +18,7 @@ public class ParticleEmitter extends ActorObject {
         super(0f, 0f, 0f, 0f);
         emitter = new com.badlogic.gdx.graphics.g2d.ParticleEmitter();
         emitter.setContinuous(true);
+//        emitter.setMaxParticleCount(2000);
     }
 
     @Override
