@@ -14,15 +14,30 @@ public class ParticleEmitter extends ActorObject {
 
     private com.badlogic.gdx.graphics.g2d.ParticleEffect effect;
     private boolean running = false;
+    private boolean followParentAngle = false;
 
     public ParticleEmitter(final String particleConfigFile) {
         super(0.0001f, 0.0001f, 0.0001f, 0.0001f);
-        setDirection(new Vector2(0.0001f, 0.0001f));
-        setPosition(new Vector2(0.0001f, 0.0001f));
+        init(particleConfigFile);
+    }
 
+    public ParticleEmitter(final String particleConfigFile, float radius, float mass, float width, float height) {
+        super(radius, mass, width, height);
+        init(particleConfigFile);
+
+    }
+
+    public ParticleEmitter(final String particleConfigFile, float radius, float mass, float maxVel, float width, float height) {
+        super(radius, mass, maxVel, width, height);
+        init(particleConfigFile);
+
+    }
+
+    private void init(final String particleConfigFile) {
         effect = new ParticleEffect();
         effect.load(Gdx.files.internal("data/particles/" + particleConfigFile), Gdx.files.internal("data/particles"));
-
+        setDirection(new Vector2(0.0001f, 0.0001f));
+        setPosition(new Vector2(0.0001f, 0.0001f));
     }
 
     @Override
@@ -36,8 +51,10 @@ public class ParticleEmitter extends ActorObject {
             final float parentAngle = getParent().getAngle();
 
             final TextureRegion texture = this.getTexture();
+            if (followParentAngle) {
+                world = new Matrix3(world).mul(new Matrix3().rotate(parentAngle));
+            }
 
-            world = new Matrix3(world).mul(new Matrix3().rotate(parentAngle));
             world = new Matrix3(world).mul(new Matrix3().setToTranslation(this.getPosition()));
             world.mul(new Matrix3().rotate(angle));
             world.mul(new Matrix3().setToTranslation(getPivot().x, getPivot().y));
@@ -83,6 +100,14 @@ public class ParticleEmitter extends ActorObject {
 
     public boolean isRunning() {
         return running;
+    }
+
+    public boolean isFollowParentAngle() {
+        return followParentAngle;
+    }
+
+    public void setFollowParentAngle(boolean followParentAngle) {
+        this.followParentAngle = followParentAngle;
     }
 
 }

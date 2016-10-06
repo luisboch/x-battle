@@ -53,6 +53,7 @@ public class Player extends ActorObject {
 
         emitter.getPivot().x = -12;
         emitter.getPivot().y = 12f;
+        emitter.setFollowParentAngle(true);
 
         getListActorObject().add(f1);
         getListActorObject().add(f2);
