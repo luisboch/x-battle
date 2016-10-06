@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
+import com.pucpr.game.states.game.engine.ParticleEmitter;
 import com.pucpr.game.states.game.engine.Projectile;
 import com.pucpr.game.states.game.engine.PursuitShot;
 import com.pucpr.game.states.game.engine.Shot;
@@ -30,29 +31,37 @@ import java.util.Map;
  * @since Jul 31, 2016
  */
 public class Player extends ActorObject {
-    
+
     private static final int INIT_HEALTH = 3000;
-    
+
     private final Map<State, Animation> animation = new HashMap<State, Animation>();
     private State state = State.IDLE;
-    float stateTime;
+    private float stateTime;
+    private final ParticleEmitter emitter = new ParticleEmitter("rocket.party");
 
     public Player() {
         super(25, 1f, 200, 50, 50);
         loadAnnimation();
-        ForceField f1 = new ForceField();
+
+        final ForceField f1 = new ForceField();
         f1.getPivot().x = 70;
-        ForceField f2 = new ForceField();
+
+        final ForceField f2 = new ForceField();
         f2.getPivot().x = 70;
-        f2.setDirection(f1.getDirection().rotate(360/3));
-        ForceField f3 = new ForceField();
+        f2.setDirection(f1.getDirection().rotate(360 / 3));
+
+        final ForceField f3 = new ForceField();
         f3.getPivot().x = 70;
-        
-        f3.setDirection(f2.getDirection().rotate(360/3));
+        f3.setDirection(f2.getDirection().rotate(360 / 3));
+
+        emitter.setDirection(f2.getDirection());
+        emitter.getPivot().x = 40;
+
         getListActorObject().add(f1);
         getListActorObject().add(f2);
         getListActorObject().add(f3);
-        
+        getListActorObject().add(emitter);
+
         // Create health
         setHealth(INIT_HEALTH);
     }
@@ -105,7 +114,7 @@ public class Player extends ActorObject {
 
             return new PursuitShot(stg, this, other, 100);
         }
-        
+
         return null;
     }
 
@@ -120,4 +129,9 @@ public class Player extends ActorObject {
     public Class<? extends Projectile> getAction3Type() {
         return SimpleShot.class;
     }
+
+    public ParticleEmitter getEmitter() {
+        return emitter;
+    }
+
 }

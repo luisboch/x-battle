@@ -4,7 +4,7 @@
 package com.pucpr.game.states.game.engine;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix3;
@@ -12,23 +12,17 @@ import com.badlogic.gdx.math.Vector2;
 
 public class ParticleEmitter extends ActorObject {
 
-    private com.badlogic.gdx.graphics.g2d.ParticleEmitter emitter;
+    private com.badlogic.gdx.graphics.g2d.ParticleEffect effect;
+    private boolean running = false;
 
-    public ParticleEmitter() {
-        super(0f, 0f, 0f, 0f);
-        emitter = new com.badlogic.gdx.graphics.g2d.ParticleEmitter();
-        emitter.setContinuous(true);
-//        emitter.setMaxParticleCount(2000);
-    }
+    public ParticleEmitter(final String particleConfigFile) {
+        super(0.0001f, 0.0001f, 0.0001f, 0.0001f);
+        setDirection(new Vector2(0.0001f, 0.0001f));
+        setPosition(new Vector2(0.0001f, 0.0001f));
 
-    @Override
-    protected TextureRegion getTexture() {
-        return null;
-    }
+        effect = new ParticleEffect();
+        effect.load(Gdx.files.internal("data/particles/" + particleConfigFile), Gdx.files.internal("data/particles"));
 
-    @Override
-    protected void tick() {
-        emitter.addParticle();
     }
 
     @Override
@@ -46,23 +40,45 @@ public class ParticleEmitter extends ActorObject {
             world.mul(new Matrix3().rotate(angle));
             world.mul(new Matrix3().setToTranslation(getPivot().x, getPivot().y));
 
-            if (texture != null) {
-                lastWorldPos = new Vector2();
+            lastWorldPos = new Vector2();
 
-                world.getTranslation(lastWorldPos);
+            world.getTranslation(lastWorldPos);
 
-                emitter.setPosition(lastWorldPos.x, lastWorldPos.y);
-                
-                if (emitter != null) {
-                    emitter.draw(render, Gdx.graphics.getDeltaTime());
-                }
+            effect.getEmitters().first().setPosition(lastWorldPos.x, lastWorldPos.y);
 
-                for (ActorObject c : getListActorObject()) {
-                    c.draw(render, new Matrix3(world).mul(new Matrix3().rotate(-angle)));
-                }
+            if (effect != null) {
+                effect.draw(render);
+            }
+
+            for (ActorObject c : getListActorObject()) {
+                c.draw(render, new Matrix3(world).mul(new Matrix3().rotate(-angle)));
             }
         }
 
+    }
+
+    @Override
+    protected TextureRegion getTexture() {
+        return null;
+    }
+
+    @Override
+    protected void tick() {
+        effect.update(Gdx.graphics.getDeltaTime());
+    }
+
+    public void start() {
+        effect.start();
+        running = true;
+    }
+
+    public void stop() {
+        effect.allowCompletion();
+        running = false;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
 }

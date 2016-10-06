@@ -3,6 +3,7 @@
  */
 package com.pucpr.game.server;
 
+import com.pucpr.game.states.game.Player;
 import com.pucpr.game.states.game.engine.ActorObject;
 
 /**
@@ -86,6 +87,14 @@ public class ActorControl {
 
     public void setUp(boolean up) {
         this.up = up;
+        if (actor != null && actor instanceof Player) {
+            final Player p = (Player) actor;
+            if (up && !p.getEmitter().isRunning()) {
+                p.getEmitter().start();
+            } else if (!up && p.getEmitter().isRunning()) {
+                p.getEmitter().stop();
+            }
+        }
     }
 
     public boolean isRight() {
