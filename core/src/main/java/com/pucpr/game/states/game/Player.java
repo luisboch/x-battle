@@ -20,9 +20,7 @@ import com.pucpr.game.states.game.engine.steering.ProjectileSteering;
 import com.pucpr.game.states.game.engine.steering.Pursuit;
 import com.pucpr.game.states.game.engine.steering.WeightSteeringStrategy;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -34,8 +32,7 @@ public class Player extends ActorObject {
 
     private static final int INIT_HEALTH = 3000;
 
-    private final Map<State, Animation> animation = new HashMap<State, Animation>();
-    private State state = State.IDLE;
+    private Animation animation;
     private float stateTime;
     private final ParticleEmitter emitter = new ParticleEmitter("rocket.party");
 
@@ -54,14 +51,15 @@ public class Player extends ActorObject {
         f3.getPivot().x = 70;
         f3.setDirection(f2.getDirection().rotate(360 / 3));
 
-        emitter.setDirection(f2.getDirection());
-        emitter.getPivot().x = 40;
+        emitter.getPivot().x = -12;
+        emitter.getPivot().y = 12f;
 
         getListActorObject().add(f1);
         getListActorObject().add(f2);
         getListActorObject().add(f3);
+        
         getListActorObject().add(emitter);
-
+//        emitter.stop();
         // Create health
         setHealth(INIT_HEALTH);
     }
@@ -70,24 +68,15 @@ public class Player extends ActorObject {
         ResourceLoader loader = ResourceLoader.getInstance();
         Texture texture = loader.getTexture("data/image/ships/SR-91A.png");
         TextureRegion[][] split = TextureRegion.split(texture, texture.getWidth(), texture.getHeight());
-
-        animation.put(State.IDLE, new Animation(01f, split[0][0]));
-        animation.put(State.RUNNING, new Animation(01f, split[0][0]));
+        
+        animation = new Animation(stateTime, split[0][0]);
         stateTime = 0f;
-    }
-
-    private static enum State {
-        IDLE,
-        RUNNING;
     }
 
     @Override
     protected TextureRegion getTexture() {
         stateTime += Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            return animation.get(State.RUNNING).getKeyFrame(stateTime);
-        }
-        return animation.get(state).getKeyFrame(stateTime);
+        return animation.getKeyFrame(stateTime);
     }
 
     public Projectile action1(World w) {

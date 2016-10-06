@@ -33,9 +33,11 @@ public class ParticleEmitter extends ActorObject {
         if (isAlive()) {
 
             final float angle = this.getAngle();
+            final float parentAngle = getParent().getAngle();
 
             final TextureRegion texture = this.getTexture();
 
+            world = new Matrix3(world).mul(new Matrix3().rotate(parentAngle));
             world = new Matrix3(world).mul(new Matrix3().setToTranslation(this.getPosition()));
             world.mul(new Matrix3().rotate(angle));
             world.mul(new Matrix3().setToTranslation(getPivot().x, getPivot().y));
@@ -47,6 +49,8 @@ public class ParticleEmitter extends ActorObject {
             effect.getEmitters().first().setPosition(lastWorldPos.x, lastWorldPos.y);
 
             if (effect != null) {
+                effect.getEmitters().first().getAngle().setHigh(parentAngle - 180);
+                effect.getEmitters().first().getAngle().setLow(parentAngle - 180);
                 effect.draw(render);
             }
 
