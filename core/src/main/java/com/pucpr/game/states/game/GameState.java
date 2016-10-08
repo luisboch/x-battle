@@ -13,8 +13,6 @@ import com.pucpr.game.GameConfig;
 import com.pucpr.game.states.AppState;
 import com.pucpr.game.states.game.basic.BasicGameScreen;
 import com.pucpr.game.states.game.basic.Game;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
