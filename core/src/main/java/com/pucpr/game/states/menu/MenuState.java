@@ -21,11 +21,12 @@ import com.pucpr.game.states.game.GameState;
 import java.util.LinkedList;
 import java.util.List;
 import com.pucpr.game.states.AboutState;
+import com.pucpr.game.states.AircraftSelectionState;
 import com.pucpr.game.states.AppState;
 
 public class MenuState implements AppState {
 
-    final List<Action> actions = new LinkedList<Action>();
+    final List<MenuAction> actions = new LinkedList<MenuAction>();
 
     private AppManager manager;
 
@@ -37,14 +38,14 @@ public class MenuState implements AppState {
         // Validate network protocol
         ProtocolTester.test();
 
-        final Action start = new Action("Start", 0);
+        final MenuAction start = new MenuAction("Start", 0);
         start.setAction(new Runnable() {
             @Override
             public void run() {
-                manager.setState(new GameState());
+                manager.setState(new AircraftSelectionState());
             }
         });
-        final Action about = new Action("About", 1);
+        final MenuAction about = new MenuAction("About", 1);
         about.setAction(new Runnable() {
             @Override
             public void run() {
@@ -52,7 +53,7 @@ public class MenuState implements AppState {
             }
         });
 
-        final Action quit = new Action("Quit", 2);
+        final MenuAction quit = new MenuAction("Quit", 2);
         quit.setAction(new Runnable() {
             @Override
             public void run() {
@@ -81,7 +82,7 @@ public class MenuState implements AppState {
 
         table.pad(10).defaults().expandX().space(4);
 
-        for (final Action ac : actions) {
+        for (final MenuAction ac : actions) {
             table.row();
 
             final TextButton button = new TextButton(ac.getLabel(), skin);
