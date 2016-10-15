@@ -36,9 +36,9 @@ public class Player extends ActorObject {
     private float stateTime;
     private final ParticleEmitter emitter = new ParticleEmitter("rocket.party");
 
-    public Player() {
+    public Player(String warcrafit) {
         super(25, 1f, 200, 50, 50);
-        loadAnnimation();
+        loadAnnimation(warcrafit);
 
         final ForceField f1 = new ForceField();
         f1.getPivot().x = 70;
@@ -58,18 +58,18 @@ public class Player extends ActorObject {
         getListActorObject().add(f1);
         getListActorObject().add(f2);
         getListActorObject().add(f3);
-        
+
         getListActorObject().add(emitter);
-//        emitter.stop();
-        // Create health
+        
+        
         setHealth(INIT_HEALTH);
     }
 
-    private void loadAnnimation() {
+    protected void loadAnnimation(String spriteWarcrafit) {
         ResourceLoader loader = ResourceLoader.getInstance();
-        Texture texture = loader.getTexture("data/image/ships/SR-91A.png");
+        Texture texture = loader.getTexture(spriteWarcrafit);
         TextureRegion[][] split = TextureRegion.split(texture, texture.getWidth(), texture.getHeight());
-        
+
         animation = new Animation(stateTime, split[0][0]);
         stateTime = 0f;
     }
@@ -86,7 +86,7 @@ public class Player extends ActorObject {
         return shot;
     }
 
-    public Projectile action2(World w) {
+    protected Projectile action2(World w) {
 
         final List<Class<? extends ActorObject>> target = new ArrayList<Class<? extends ActorObject>>();
 
@@ -122,6 +122,12 @@ public class Player extends ActorObject {
 
     public ParticleEmitter getEmitter() {
         return emitter;
+    }
+
+    public Projectile Action3(World w) {
+        
+        
+        return null;
     }
 
 }
