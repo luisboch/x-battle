@@ -34,7 +34,7 @@ public class Player extends ActorObject {
 
     private Animation animation;
     private float stateTime;
-    private final ParticleEmitter emitter = new ParticleEmitter("rocket.party");
+    private final ParticleEmitter rocketEmitter = new ParticleEmitter("rocket.party");
 
     public Player(String warcrafit) {
         super(25, 1f, 200, 50, 50);
@@ -51,17 +51,19 @@ public class Player extends ActorObject {
         f3.getPivot().x = 70;
         f3.setDirection(f2.getDirection().rotate(360 / 3));
 
-        emitter.getPivot().x = -12;
-        emitter.getPivot().y = 12f;
-        emitter.setFollowParentAngle(true);
+        rocketEmitter.getPivot().x = -12;
+        rocketEmitter.getPivot().y = 12f;
+        rocketEmitter.setFollowParentAngle(true);
 
         getListActorObject().add(f1);
         getListActorObject().add(f2);
         getListActorObject().add(f3);
 
-        getListActorObject().add(emitter);
         
-        
+        getListActorObject().add(rocketEmitter);
+//        rocketEmitter.stop();
+        // Create health
+
         setHealth(INIT_HEALTH);
     }
 
@@ -120,8 +122,8 @@ public class Player extends ActorObject {
         return SimpleShot.class;
     }
 
-    public ParticleEmitter getEmitter() {
-        return emitter;
+    public ParticleEmitter getRocketEmitter() {
+        return rocketEmitter;
     }
 
     public Projectile Action3(World w) {

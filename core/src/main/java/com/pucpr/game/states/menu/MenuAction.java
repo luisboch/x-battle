@@ -7,41 +7,41 @@ import java.util.List;
  *
  * @author luis
  */
-class Action {
+public class MenuAction {
 
-    private final List<Action> subMenu = new ArrayList<Action>();
+    private final List<MenuAction> subMenu = new ArrayList<MenuAction>();
     private String label;
     private Runnable action;
     private final int index;
 
-    public Action() {
+    public MenuAction() {
         index = 0;
     }
 
-    public Action(String label, int index) {
+    public MenuAction(String label, int index) {
         this.label = label;
         this.index = index;
     }
     
 
-    public Action(String label, Runnable action) {
+    public MenuAction(String label, Runnable action) {
         this.label = label;
         this.action = action;
         this.index = 0;
     }
 
-    public Action(String label, Runnable action, int index) {
+    public MenuAction(String label, Runnable action, int index) {
         this.label = label;
         this.action = action;
         this.index = index;
     }
 
-    public Action(String label) {
+    public MenuAction(String label) {
         this.label = label;
         this.index = 0;
     }
 
-    public List<Action> getSubMenu() {
+    public List<MenuAction> getSubMenu() {
         return subMenu;
     }
 

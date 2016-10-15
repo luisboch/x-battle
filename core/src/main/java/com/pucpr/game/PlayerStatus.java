@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class PlayerStatus {
 
-    private static final PlayerStatus _instance = new PlayerStatus();
+    private static final PlayerStatus _INSTANCE = new PlayerStatus();
 
     private final Map<Keys, Object> playersKeys = new EnumMap<Keys, Object>(Keys.class);
 
@@ -25,7 +25,7 @@ public class PlayerStatus {
     }
 
     public static PlayerStatus getInstance() {
-        return _instance;
+        return _INSTANCE;
     }
 
     /**
@@ -70,6 +70,9 @@ public class PlayerStatus {
 
     public String stringKey(Keys key) {
         return playersKeys.containsKey(key) ? ((String) playersKeys.get(key)) : "";
+    }
+    public Integer intKey(Keys key) {
+        return playersKeys.containsKey(key) ? ((Integer) playersKeys.get(key)) : null;
     }
 
     public void set(Keys k, Object obj) {

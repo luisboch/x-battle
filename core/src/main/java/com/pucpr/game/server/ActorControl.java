@@ -89,10 +89,10 @@ public class ActorControl {
         this.up = up;
         if (actor != null && actor instanceof Player) {
             final Player p = (Player) actor;
-            if (up && !p.getEmitter().isRunning()) {
-                p.getEmitter().start();
-            } else if (!up && p.getEmitter().isRunning()) {
-                p.getEmitter().stop();
+            if (up && !p.getRocketEmitter().isRunning()) {
+                p.getRocketEmitter().start();
+            } else if (!up && p.getRocketEmitter().isRunning()) {
+                p.getRocketEmitter().stop();
             }
         }
     }

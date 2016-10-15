@@ -19,8 +19,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.pucpr.game.Aircrafts;
 import com.pucpr.game.AppManager;
 import com.pucpr.game.GameConfig;
+import com.pucpr.game.Keys;
 import com.pucpr.game.PlayerStatus;
 import com.pucpr.game.server.ActorControl;
 import com.pucpr.game.server.GameService;
@@ -61,8 +63,8 @@ public class BasicGameScreen implements GameScreenState {
     protected MapRenderer render;
     protected Vector3 mousePos = new Vector3();
 
-    protected Player player = new Player();
-    protected Player player2 = new Player();
+    protected Player player;
+    protected Player player2;
     protected ActorControl playerControl;
 
     protected List<Planet> planet = new ArrayList<Planet>();
@@ -77,6 +79,9 @@ public class BasicGameScreen implements GameScreenState {
 
         camera.position.x = 0;
         camera.position.y = 0;
+
+        player = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
+        player2 = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
 
         render = new OrthogonalTiledMapRenderer(map, 1f / GameConfig.PPM);
         // next we setup the immediate mode renderer

@@ -1,9 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * AircraftSelectionState.class
  */
-package com.pucpr.game.states.menu;
+package com.pucpr.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -15,16 +13,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.pucpr.game.AppManager;
-import com.pucpr.game.resources.ResourceLoader;
+import com.pucpr.game.Keys;
+import com.pucpr.game.PlayerStatus;
 import com.pucpr.game.server.local.ProtocolTester;
 import com.pucpr.game.states.game.GameState;
+import com.pucpr.game.states.menu.MenuAction;
 import java.util.LinkedList;
 import java.util.List;
-import com.pucpr.game.states.AboutState;
-import com.pucpr.game.states.AircraftSelectionState;
-import com.pucpr.game.states.AppState;
 
-public class MenuState implements AppState {
+/**
+ *
+ * @author Luis Boch
+ * @email luis.c.boch@gmail.com
+ * @since Oct 7, 2016
+ */
+public class AircraftSelectionState implements AppState {
 
     final List<MenuAction> actions = new LinkedList<MenuAction>();
 
@@ -33,31 +36,35 @@ public class MenuState implements AppState {
     private Stage stage;
     private Table container;
 
+    @Override
     public void create() {
 
         // Validate network protocol
         ProtocolTester.test();
 
-        final MenuAction start = new MenuAction("Start", 0);
+        final MenuAction start = new MenuAction("Nave 1", 0);
         start.setAction(new Runnable() {
             @Override
             public void run() {
-                manager.setState(new AircraftSelectionState());
+                PlayerStatus.getInstance().set(Keys.AIRCRAFT, 1);
+                manager.setState(new GameState());
             }
         });
-        final MenuAction about = new MenuAction("About", 1);
+        final MenuAction about = new MenuAction("Nave 2", 1);
         about.setAction(new Runnable() {
             @Override
             public void run() {
-                manager.setState(new AboutState());
+                PlayerStatus.getInstance().set(Keys.AIRCRAFT, 2);
+                manager.setState(new GameState());
             }
         });
 
-        final MenuAction quit = new MenuAction("Quit", 2);
+        final MenuAction quit = new MenuAction("Nave 3", 2);
         quit.setAction(new Runnable() {
             @Override
             public void run() {
-                manager.quit();
+                PlayerStatus.getInstance().set(Keys.AIRCRAFT, 3);
+                manager.setState(new GameState());
             }
         });
 

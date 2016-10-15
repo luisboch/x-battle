@@ -10,10 +10,5 @@ package com.pucpr.game;
  * @author luis
  */
 public enum Keys {
-    SWORD_TOOK,
-    SIMPLE_HIT_TEST,
-    SUPER_HIT_TEST,
-    KEY_COD157767_TOOK,
-    RUSH_TEST_ISCOMPLETE,
-    RUSH_TEST_DONE;
+    AIRCRAFT;
 }
