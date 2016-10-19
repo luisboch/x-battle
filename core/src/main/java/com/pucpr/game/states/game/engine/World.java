@@ -203,7 +203,7 @@ public class World {
             final Vector2 forces;
 
             if (!obj.getClass().equals(Planet.class)) {
-                if (obj.getClass().isAssignableFrom(Player.class)) {
+                if (Player.class.isAssignableFrom(obj.getClass())) {
                     control = calculateControl((Player) obj);
                 } else {
                     control = new Vector2();
