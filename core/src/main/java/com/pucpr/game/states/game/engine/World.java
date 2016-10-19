@@ -133,7 +133,7 @@ public class World {
         for (ActorObject obj : actors) {
             if (!ignored.contains(obj)) {
                 float dst = obj.getPosition().dst(center);
-                if (allowedTypes.contains(obj.getClass()) && dst < viewSize) {
+                if (isClassAllowed(allowedTypes, obj.getClass()) && dst < viewSize) {
                     if (closest == null || dst < closestDis) {
                         closest = obj;
                         closestDis = dst;
@@ -142,6 +142,17 @@ public class World {
             }
         }
         return closest;
+    }
+
+    private boolean isClassAllowed(List<Class<? extends ActorObject>> allowedTypes, Class<? extends ActorObject> targetClass) {
+        
+        for (Class<? extends ActorObject> ori : allowedTypes) {
+            if (ori.isAssignableFrom(targetClass)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void discoverActors(List<ActorObject> currentList, Collection<ActorObject> source) {
@@ -312,7 +323,7 @@ public class World {
             if (!objA.getClass().equals(ForceField.class)) {
                 result.sub(forceField);
             }
-            
+
             expForce.add(forceField);
         }
 
