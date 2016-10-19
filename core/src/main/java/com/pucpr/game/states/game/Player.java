@@ -108,6 +108,10 @@ public class Player extends ActorObject {
 
         return null;
     }
+    
+    public Projectile action3(World w) {
+        return null;
+    }
 
     public Class<? extends Projectile> getAction1Type() {
         return SimpleShot.class;

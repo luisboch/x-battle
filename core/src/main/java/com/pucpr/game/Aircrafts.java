@@ -3,6 +3,9 @@
  */
 package com.pucpr.game;
 
+import com.pucpr.game.states.game.Nave1;
+import com.pucpr.game.states.game.Nave2;
+import com.pucpr.game.states.game.Nave3;
 import com.pucpr.game.states.game.Player;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,9 +24,9 @@ public class Aircrafts {
             = new HashMap<Integer, Class<? extends Player>>();
 
     static {
-        AIRCRAFT_REF_TYPE.put(1, Player.class);
-        AIRCRAFT_REF_TYPE.put(2, Player.class);
-        AIRCRAFT_REF_TYPE.put(3, Player.class);
+        AIRCRAFT_REF_TYPE.put(1, Nave1.class);
+        AIRCRAFT_REF_TYPE.put(2, Nave2.class);
+        AIRCRAFT_REF_TYPE.put(3, Nave3.class);
     }
 
     public static Player getNewPlayer(Integer type) {

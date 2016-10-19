@@ -203,7 +203,7 @@ public class World {
             final Vector2 forces;
 
             if (!obj.getClass().equals(Planet.class)) {
-                if (obj.getClass().equals(Player.class)) {
+                if (obj.getClass().isAssignableFrom(Player.class)) {
                     control = calculateControl((Player) obj);
                 } else {
                     control = new Vector2();
@@ -372,6 +372,13 @@ public class World {
             if (act.isAction2()) {
                 final Projectile pro = obj.action2(this);
                 if (pro != null && canPlayerCreateProjectile(obj, obj.getAction2Type())) {
+                    createProjectile(obj, pro);
+                }
+            }
+            // Bombs?
+            if (act.isAction2()) {
+                final Projectile pro = obj.action3(this);
+                if (pro != null && canPlayerCreateProjectile(obj, obj.getAction3Type())) {
                     createProjectile(obj, pro);
                 }
             }
