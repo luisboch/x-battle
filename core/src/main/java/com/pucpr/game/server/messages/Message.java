@@ -4,6 +4,7 @@
 package com.pucpr.game.server.messages;
 
 import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.states.game.Nave1;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
 import com.pucpr.game.states.game.engine.ActorObject;
@@ -106,7 +107,6 @@ public abstract class Message {
         return ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort(val).array();
     }
 
-
     public static short bytesToShort(byte... intBytes) {
         return ByteBuffer.wrap(intBytes).order(ByteOrder.LITTLE_ENDIAN).getShort();
     }
@@ -131,7 +131,7 @@ public abstract class Message {
     protected ActorObject getActor(byte type, int posX, int posY, int angle, short uid, byte annimationState) {
         ActorObject act = null;
         if (type == 1) {
-            act = new Player();
+            act = new Nave1();
         } else if (type == 2) {
             act = new SimpleShot();
         } else if (type == 3) {

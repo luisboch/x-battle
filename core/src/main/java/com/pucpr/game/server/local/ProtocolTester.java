@@ -8,6 +8,7 @@ import com.pucpr.game.server.messages.CommandMessage;
 import com.pucpr.game.server.messages.ConnectMessage;
 import com.pucpr.game.server.messages.MessageParser;
 import com.pucpr.game.server.messages.StatusMessage;
+import com.pucpr.game.states.game.Nave1;
 import com.pucpr.game.states.game.Planet;
 import com.pucpr.game.states.game.Player;
 import com.pucpr.game.states.game.engine.ActorObject;
@@ -71,7 +72,7 @@ public class ProtocolTester {
 
         final StatusMessage status = new StatusMessage(type, commandBytes);
 
-        Player p = new Player();
+        Player p = new Nave1();
         p.setPosition(new Vector2(200, 100));
         p.setDirection(new Vector2(54, 19).rotate(90));
 

@@ -59,7 +59,6 @@ public class Player extends ActorObject {
         getListActorObject().add(f2);
         getListActorObject().add(f3);
 
-        
         getListActorObject().add(rocketEmitter);
 //        rocketEmitter.stop();
         // Create health
@@ -88,7 +87,7 @@ public class Player extends ActorObject {
         return shot;
     }
 
-    protected Projectile action2(World w) {
+    public Projectile action2(World w) {
 
         final List<Class<? extends ActorObject>> target = new ArrayList<Class<? extends ActorObject>>();
 
@@ -127,8 +126,7 @@ public class Player extends ActorObject {
     }
 
     public Projectile Action3(World w) {
-        
-        
+
         return null;
     }
 
