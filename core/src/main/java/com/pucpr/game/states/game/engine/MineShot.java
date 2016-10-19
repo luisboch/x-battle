@@ -36,7 +36,4 @@ public class MineShot extends Shot {
     public float getInitialVelocity() {
         return 0f; 
     }
-    
-    
-
 }
