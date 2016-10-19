@@ -22,7 +22,7 @@ import java.util.List;
 public class Nave2 extends Player {
 
     public Nave2() {
-        super("data/image/ships/SR-91A.png");
+        super("data/image/ships/Ye-355A.PNG");
     }
 
     @Override
