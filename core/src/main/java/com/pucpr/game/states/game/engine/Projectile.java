@@ -22,6 +22,7 @@ public abstract class Projectile extends ActorObject {
     static {
         reloadTimeConfig.put(Shot.class, 500f);
         reloadTimeConfig.put(SimpleShot.class, 300f);
+        reloadTimeConfig.put(MineShot.class, 1000f);
     }
     
     private Animation animation;

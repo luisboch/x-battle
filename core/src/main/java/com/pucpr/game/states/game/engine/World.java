@@ -387,7 +387,7 @@ public class World {
                 }
             }
             // Bombs?
-            if (act.isAction2()) {
+            if (act.isAction3()) {
                 final Projectile pro = obj.action3(this);
                 if (pro != null && canPlayerCreateProjectile(obj, obj.getAction3Type())) {
                     createProjectile(obj, pro);

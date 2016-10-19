@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
+import com.pucpr.game.states.game.engine.MineShot;
 import com.pucpr.game.states.game.engine.ParticleEmitter;
 import com.pucpr.game.states.game.engine.Projectile;
 import com.pucpr.game.states.game.engine.PursuitShot;
@@ -110,7 +111,7 @@ public class Player extends ActorObject {
     }
     
     public Projectile action3(World w) {
-        return null;
+            return new MineShot(null, this, null, 100);
     }
 
     public Class<? extends Projectile> getAction1Type() {
@@ -122,7 +123,7 @@ public class Player extends ActorObject {
     }
 
     public Class<? extends Projectile> getAction3Type() {
-        return SimpleShot.class;
+        return MineShot.class;
     }
 
     public ParticleEmitter getRocketEmitter() {

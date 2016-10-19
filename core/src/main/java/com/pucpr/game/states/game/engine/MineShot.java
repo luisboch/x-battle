@@ -32,4 +32,11 @@ public class MineShot extends Shot {
         setFrom(from);
     }
 
+    @Override
+    public float getInitialVelocity() {
+        return 0f; 
+    }
+    
+    
+
 }

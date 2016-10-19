@@ -29,10 +29,6 @@ public class Shot extends SimpleShot {
     protected void init(ActorObject target, int minProximity) {
         this.target = target;
         this.minProximity = minProximity;
-        
-        if (target == null) {
-            throw new IllegalArgumentException("Target is required");
-        }
     }
     
 }
