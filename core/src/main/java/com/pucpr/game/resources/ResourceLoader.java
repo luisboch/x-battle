@@ -47,6 +47,8 @@ public class ResourceLoader {
         resources.get("sprites").add("data/image/disasteroids/fire.png");
         resources.get("sprites").add("data/image/disasteroids/fire2.png");
         resources.get("sprites").add("data/image/explosions/explosion1.png");
+        resources.get("sprites").add("data/image/commom/lifebar.png");
+        resources.get("sprites").add("data/image/commom/lifebar-inner.png");
     }
 
     public static synchronized ResourceLoader getInstance() {

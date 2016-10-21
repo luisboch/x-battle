@@ -153,7 +153,7 @@ public class BasicGameScreen implements GameScreenState {
 
         batch.begin();
         for (ActorObject obj : service.getActors()) {
-            obj.draw(batch, new Matrix3().idt());
+            obj.draw(batch, new Matrix3().idt(), camera);
         }
 
         batch.end();

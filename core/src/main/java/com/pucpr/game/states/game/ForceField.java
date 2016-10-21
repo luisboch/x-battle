@@ -19,7 +19,7 @@ public class ForceField extends ParticleEmitter {
     float stateTime;
 
     public ForceField() {
-        super("shield.party", 25, 1f, 200, 50, 50);
+        super("shield.party", 15, 1f, 200, 30, 30);
         setHealth(INIT_HEALTH);
     }
 

@@ -4,11 +4,14 @@
 package com.pucpr.game.states.game.engine;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.resources.ResourceLoader;
 
 public class ParticleEmitter extends ActorObject {
 
@@ -41,7 +44,7 @@ public class ParticleEmitter extends ActorObject {
     }
 
     @Override
-    public void draw(SpriteBatch render, Matrix3 world) {
+    public void draw(SpriteBatch render, Matrix3 world, OrthographicCamera camera) {
 
         tick();
 
@@ -72,7 +75,7 @@ public class ParticleEmitter extends ActorObject {
             }
 
             for (ActorObject c : getListActorObject()) {
-                c.draw(render, new Matrix3(world).mul(new Matrix3().rotate(-angle)));
+                c.draw(render, new Matrix3(world).mul(new Matrix3().rotate(-angle)), camera);
             }
         }
 

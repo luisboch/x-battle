@@ -3,11 +3,14 @@
  */
 package com.pucpr.game.states.game.engine;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.UIDManager;
 import com.pucpr.game.states.game.engine.steering.Steering;
 import java.util.ArrayList;
@@ -34,13 +37,14 @@ public abstract class ActorObject {
     private final Vector2 direction = new Vector2();
     protected Vector2 lastWorldPos = new Vector2();
     private Vector2 pivot = new Vector2(0f, 0f);
-    private final Vector2 size; // Render used only
+    protected final Vector2 size; // Render used only
 
     private final String type;
 
     private Steering steering;
 
-    protected int health = -1;
+    protected int health = -999999;
+    protected int initHealth = health;
 
     private final List<ActorObject> listActorObject;
     private ActorObject parent;
@@ -105,22 +109,21 @@ public abstract class ActorObject {
                 h = h < 0 ? 0 : h;
 
                 this.health = (int) h;
-
-                System.out.println("Remaining health: " + h);
             }
         }
     }
 
     public final void setHealth(Integer health) {
         this.health = health;
+        this.initHealth = health;
     }
 
-    public void draw(SpriteBatch render, Matrix3 world) {
+    public void draw(SpriteBatch render, Matrix3 world, OrthographicCamera camera) {
 
         tick();
-        
+
         if (isAlive()) {
-        
+
             final float angle = this.getAngle();
 
             final TextureRegion texture = this.getTexture();
@@ -129,21 +132,44 @@ public abstract class ActorObject {
             world.mul(new Matrix3().rotate(angle));
             world.mul(new Matrix3().setToTranslation(getPivot().x, getPivot().y));
 
-            if (texture != null) {
-                lastWorldPos = new Vector2();
+            lastWorldPos = new Vector2();
+            world.getTranslation(lastWorldPos);
 
-                world.getTranslation(lastWorldPos);
+            if (health != -999999) {
+                final Sprite healthBar
+                        = new Sprite(ResourceLoader.getInstance().getTexture(
+                                "data/image/commom/lifebar.png"));
+                final Sprite healthInner
+                        = new Sprite(ResourceLoader.getInstance().getTexture(
+                                "data/image/commom/lifebar-inner.png"));
+                final Vector2 healthPos = new Vector2(lastWorldPos.x - (healthBar.getWidth() * 0.5f), lastWorldPos.y - (size.y * 0.5f));
+                healthBar.setCenter(0, 0);
+                healthBar.setPosition(healthPos.x, healthPos.y);
+
+                final float healthArea = healthBar.getWidth() - 2f;
+                final float scaleX = healthArea * ((float) health / (float) initHealth);
+                System.out.println("Scale:" + scaleX);
+                final float xCorrection = healthArea - scaleX;
+                healthInner.setCenter(0, 0);
+                healthInner.setPosition(healthPos.x + (scaleX * 0.5f), healthPos.y);
+                healthInner.setScale(scaleX, 1f);
+                healthInner.draw(render);
+                healthBar.draw(render);
+            }
+
+            if (texture != null) {
                 final Sprite sprite = new Sprite(texture);
 
-                sprite.setPosition(lastWorldPos.x - (sprite.getWidth() / 2), lastWorldPos.y - (sprite.getHeight() / 2));
+                sprite.setPosition(lastWorldPos.x - (sprite.getWidth() * 0.5f), lastWorldPos.y - (sprite.getHeight() * 0.5f));
                 sprite.setRotation(angle);
                 sprite.setScale(this.getSize().x / sprite.getWidth(), this.getSize().y / sprite.getHeight());
                 sprite.draw(render);
 
                 for (ActorObject c : getListActorObject()) {
-                    c.draw(render, new Matrix3(world).mul(new Matrix3().rotate(-angle)));
+                    c.draw(render, new Matrix3(world).mul(new Matrix3().rotate(-angle)), camera);
                 }
             }
+
         }
     }
 
@@ -248,7 +274,7 @@ public abstract class ActorObject {
         // Ignored...
     }
 
-    public List<ActorObject> getListActorObject() {
+    public final List<ActorObject> getListActorObject() {
         return listActorObject;
     }
 
@@ -341,7 +367,7 @@ public abstract class ActorObject {
     }
 
     public boolean isAlive() {
-        return health == -1 || health > 0;
+        return health == -999999 || health > 0;
     }
 
 }

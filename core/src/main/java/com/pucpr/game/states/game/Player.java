@@ -37,9 +37,9 @@ public class Player extends ActorObject {
     private float stateTime;
     private final ParticleEmitter rocketEmitter = new ParticleEmitter("rocket.party");
 
-    public Player(String warcrafit) {
+    public Player(String warcraft) {
         super(25, 1f, 200, 50, 50);
-        loadAnnimation(warcrafit);
+        loadAnnimation(warcraft);
 
         final ForceField f1 = new ForceField();
         f1.getPivot().x = 70;
@@ -61,7 +61,6 @@ public class Player extends ActorObject {
         getListActorObject().add(f3);
 
         getListActorObject().add(rocketEmitter);
-//        rocketEmitter.stop();
         // Create health
 
         setHealth(INIT_HEALTH);
