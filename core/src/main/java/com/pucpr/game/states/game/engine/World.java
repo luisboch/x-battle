@@ -89,7 +89,7 @@ public class World {
             throw new IllegalArgumentException("All params are required!");
         }
 
-        viewSize = viewSize * 1.3f; //ads 30% to view
+        viewSize = viewSize * 1.3f; //add 30% to view
 
         final List<ActorObject> list = new ArrayList<ActorObject>();
 

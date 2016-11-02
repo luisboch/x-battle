@@ -147,8 +147,8 @@ public abstract class ActorObject {
                 healthBar.setPosition(healthPos.x, healthPos.y);
 
                 final float healthArea = healthBar.getWidth() - 2f;
-                final float scaleX = healthArea * ((float) health / (float) initHealth);
-                System.out.println("Scale:" + scaleX);
+                final float scaleX = healthArea * getHealthPercent();
+                
                 final float xCorrection = healthArea - scaleX;
                 healthInner.setCenter(0, 0);
                 healthInner.setPosition(healthPos.x + (scaleX * 0.5f), healthPos.y);
@@ -278,6 +278,10 @@ public abstract class ActorObject {
         return listActorObject;
     }
 
+    public final List<ActorObject> getChildren() {
+        return getListActorObject();
+    }
+
     public void setListActorObject(List<ActorObject> listActorObject) {
         this.listActorObject.clear();
         this.listActorObject.addAll(listActorObject);
@@ -289,6 +293,22 @@ public abstract class ActorObject {
 
     public ActorObject getParent() {
         return parent;
+    }
+
+    public float getHealthPercent() {
+        return (float) health / (float) initHealth;
+    }
+
+    /**
+     * 
+     * @param percent value from 0 to 100
+     */
+    public void setHealthByPercent(byte percent) {
+        setHealthByPercent(((float) percent / 100f));
+    }
+
+    public void setHealthByPercent(float percent) {
+        health = (int) ((float) initHealth * percent);
     }
 
     private static class ControlList extends ArrayList<ActorObject> {
