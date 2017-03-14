@@ -20,7 +20,6 @@ public class Planet extends ActorObject{
 
     public Planet() {
         super(50, 100000, 100, 100);
-        loadAnnimation();
     }
 
     
@@ -28,9 +27,9 @@ public class Planet extends ActorObject{
     protected TextureRegion getTexture() {
         return animation.getKeyFrame(0);
     }
-    
-    
-    private void loadAnnimation() {
+
+    @Override
+    protected void setupGraphics() {
         ResourceLoader loader = ResourceLoader.getInstance();
         Texture texture = loader.getTexture("data/image/basic.png");
         TextureRegion[][] split = TextureRegion.split(texture, texture.getWidth(), texture.getHeight());

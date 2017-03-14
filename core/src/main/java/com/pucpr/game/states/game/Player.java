@@ -33,14 +33,15 @@ public class Player extends ActorObject {
 
     private static final int INIT_HEALTH = 3000;
 
+    private final String warcraft;
     private Animation animation;
     private float stateTime;
     private final ParticleEmitter rocketEmitter = new ParticleEmitter("rocket.party");
 
     public Player(String warcraft) {
         super(25, 1f, 200, 50, 50);
-        loadAnnimation(warcraft);
-
+        this.warcraft = warcraft;
+        
         final ForceField f1 = new ForceField();
         f1.getPivot().x = 70;
 
@@ -61,11 +62,17 @@ public class Player extends ActorObject {
         getListActorObject().add(f3);
 
         getListActorObject().add(rocketEmitter);
+        
         // Create health
-
         setHealth(INIT_HEALTH);
     }
 
+    @Override
+    protected void setupGraphics() {
+        loadAnnimation(warcraft);
+
+    }
+    
     protected void loadAnnimation(String spriteWarcrafit) {
         ResourceLoader loader = ResourceLoader.getInstance();
         Texture texture = loader.getTexture(spriteWarcrafit);

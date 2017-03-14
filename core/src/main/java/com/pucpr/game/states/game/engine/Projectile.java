@@ -32,12 +32,13 @@ public abstract class Projectile extends ActorObject {
     protected boolean canExplode = false;
     protected float initialVelocity = 200f;
     protected ActorObject from;
+    private final String image;
 
     public Projectile(final String image, float radius, float mass, float maxVel,
             float maxForce, Vector2 size, float explosionRadius,
             float explosionForce, int lifeTime) {
         super(radius, mass, maxVel, maxForce, size);
-        loadAnnimation(image);
+        this.image = image;
         this.explosionRadius = explosionRadius;
         this.explosionForce = explosionForce;
         this.lifeTime = lifeTime > 30000 ? 30000 : lifeTime;
@@ -48,7 +49,8 @@ public abstract class Projectile extends ActorObject {
         return animation.getKeyFrame(0);
     }
 
-    private void loadAnnimation(String image) {
+    @Override
+    protected void setupGraphics() {
         ResourceLoader loader = ResourceLoader.getInstance();
         Texture texture = loader.getTexture("data/image/" + image);
         TextureRegion[][] split = TextureRegion.split(texture, texture.getWidth(), texture.getHeight());

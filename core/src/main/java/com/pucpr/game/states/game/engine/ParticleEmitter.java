@@ -6,37 +6,42 @@ package com.pucpr.game.states.game.engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
-import com.pucpr.game.resources.ResourceLoader;
 
 public class ParticleEmitter extends ActorObject {
 
     private com.badlogic.gdx.graphics.g2d.ParticleEffect effect;
     private boolean running = false;
     private boolean followParentAngle = false;
-
+    private final String particleConfigFile;
+    
     public ParticleEmitter(final String particleConfigFile) {
         super(0.0001f, 0.0001f, 0.0001f, 0.0001f);
-        init(particleConfigFile);
+        this.particleConfigFile = particleConfigFile;
     }
 
     public ParticleEmitter(final String particleConfigFile, float radius, float mass, float width, float height) {
         super(radius, mass, width, height);
-        init(particleConfigFile);
-
+        this.particleConfigFile = particleConfigFile;
     }
 
     public ParticleEmitter(final String particleConfigFile, float radius, float mass, float maxVel, float width, float height) {
         super(radius, mass, maxVel, width, height);
-        init(particleConfigFile);
-
+        this.particleConfigFile = particleConfigFile;
     }
 
-    private void init(final String particleConfigFile) {
+    @Override
+    protected void setupGraphics() {
+        
+        if(!graphicsReady){
+            graphicsReady = true;
+        } else {
+            return;
+        }
+        
         effect = new ParticleEffect();
         effect.load(Gdx.files.internal("data/particles/" + particleConfigFile), Gdx.files.internal("data/particles"));
         setDirection(new Vector2(0.0001f, 0.0001f));
@@ -45,7 +50,9 @@ public class ParticleEmitter extends ActorObject {
 
     @Override
     public void draw(SpriteBatch render, Matrix3 world, OrthographicCamera camera) {
-
+        
+        setupGraphics();
+        
         tick();
 
         if (isAlive()) {
@@ -92,6 +99,7 @@ public class ParticleEmitter extends ActorObject {
     }
 
     public void start() {
+        setupGraphics();
         effect.start();
         running = true;
     }

@@ -36,7 +36,6 @@ public class Explosion extends ActorObject {
         this.setPosition(position);
         this.force = force;
         this.currentForce = force;
-        loadAnnimation();
     }
 
     @Override
@@ -52,7 +51,8 @@ public class Explosion extends ActorObject {
         alive = currentForce > 1;
     }
 
-    private void loadAnnimation() {
+    @Override
+    protected void setupGraphics() {
 
         ResourceLoader loader = ResourceLoader.getInstance();
         Texture texture = loader.getTexture("data/image/explosions/explosion1.png");
