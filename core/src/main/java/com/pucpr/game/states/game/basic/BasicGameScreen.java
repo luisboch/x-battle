@@ -64,7 +64,7 @@ public class BasicGameScreen implements GameScreenState {
     protected Vector3 mousePos = new Vector3();
 
     protected Player player;
-    protected Player player2;
+//    protected Player player2;
     protected ActorControl playerControl;
 
     protected List<Planet> planet = new ArrayList<Planet>();
@@ -81,7 +81,7 @@ public class BasicGameScreen implements GameScreenState {
         camera.position.y = 0;
 
         player = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
-        player2 = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
+//        player2 = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
 
         render = new OrthogonalTiledMapRenderer(map, 1f / GameConfig.PPM);
         // next we setup the immediate mode renderer
@@ -98,8 +98,8 @@ public class BasicGameScreen implements GameScreenState {
             service = new RemoteSevice(GameConfig.serverHost);
         }
 
-        player2.setPosition(new Vector2(300, 300));
-        playerControl = service.insert(player2);
+//        player2.setPosition(new Vector2(300, 300));
+//        playerControl = service.insert(player2);
         player.setPosition(new Vector2(400, 400));
         playerControl = service.insert(player);
 

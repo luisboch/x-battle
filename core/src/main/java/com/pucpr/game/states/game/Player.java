@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.resources.ResourceLoader;
 import com.pucpr.game.states.game.engine.ActorObject;
 import com.pucpr.game.states.game.engine.MineShot;
@@ -44,6 +45,7 @@ public class Player extends ActorObject {
         
         final ForceField f1 = new ForceField();
         f1.getPivot().x = 70;
+        f1.setDirection(new Vector2(1, 1).nor());
 
         final ForceField f2 = new ForceField();
         f2.getPivot().x = 70;

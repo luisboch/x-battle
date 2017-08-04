@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.pucpr.game.resources.ResourceLoader;
+import com.pucpr.game.states.game.ForceField;
 import com.pucpr.game.states.game.UIDManager;
 import com.pucpr.game.states.game.engine.steering.Steering;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public abstract class ActorObject {
 
     private short uID = UIDManager.next(this);
     protected boolean graphicsReady = false;
-    
+
     private final float radius;
     private final float mass;
     private final float maxVel;
@@ -98,7 +99,7 @@ public abstract class ActorObject {
      * Called only one time before first draw.
      */
     protected abstract void setupGraphics();
-    
+
     public Vector2 getLastWorldPos() {
         return lastWorldPos;
     }
@@ -124,12 +125,12 @@ public abstract class ActorObject {
     }
 
     public void draw(SpriteBatch render, Matrix3 world, OrthographicCamera camera) {
-        
+
         if(!graphicsReady){
             setupGraphics();
             graphicsReady = true;
         }
-        
+
         tick();
 
         if (isAlive()) {
@@ -158,7 +159,7 @@ public abstract class ActorObject {
 
                 final float healthArea = healthBar.getWidth() - 2f;
                 final float scaleX = healthArea * getHealthPercent();
-                
+
                 final float xCorrection = healthArea - scaleX;
                 healthInner.setCenter(0, 0);
                 healthInner.setPosition(healthPos.x + (scaleX * 0.5f), healthPos.y);
@@ -310,7 +311,7 @@ public abstract class ActorObject {
     }
 
     /**
-     * 
+     *
      * @param percent value from 0 to 100
      */
     public void setHealthByPercent(byte percent) {

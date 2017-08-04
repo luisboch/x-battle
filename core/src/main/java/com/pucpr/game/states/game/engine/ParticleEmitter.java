@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
+import com.pucpr.game.states.game.ForceField;
 
 public class ParticleEmitter extends ActorObject {
 
@@ -17,7 +18,7 @@ public class ParticleEmitter extends ActorObject {
     private boolean running = false;
     private boolean followParentAngle = false;
     private final String particleConfigFile;
-    
+
     public ParticleEmitter(final String particleConfigFile) {
         super(0.0001f, 0.0001f, 0.0001f, 0.0001f);
         this.particleConfigFile = particleConfigFile;
@@ -35,24 +36,26 @@ public class ParticleEmitter extends ActorObject {
 
     @Override
     protected void setupGraphics() {
-        
-        if(!graphicsReady){
+
+        if (!graphicsReady) {
             graphicsReady = true;
         } else {
             return;
         }
-        
+
         effect = new ParticleEffect();
         effect.load(Gdx.files.internal("data/particles/" + particleConfigFile), Gdx.files.internal("data/particles"));
-        setDirection(new Vector2(0.0001f, 0.0001f));
+        if (!(this instanceof ForceField)) {
+            setDirection(new Vector2(0.0001f, 0.0001f));
+        }
         setPosition(new Vector2(0.0001f, 0.0001f));
     }
 
     @Override
     public void draw(SpriteBatch render, Matrix3 world, OrthographicCamera camera) {
-        
+
         setupGraphics();
-        
+
         tick();
 
         if (isAlive()) {
