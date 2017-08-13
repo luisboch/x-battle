@@ -19,7 +19,7 @@ Jogo para 2 jogadores sendo:
 <b>Observações:</b>
 O jogo foi feito com 2 propósitos:
 
-<b>1</b> atender a disciplina de matemática: ver classe com.pucpr.game.states.game.engine.World
+<b>1</b> atender a disciplina de matemática: ver classe com.pucpr.game.states.game.engine.World <br/>
 <b>2</b> atender a disciplina de multiplayer: ver pacotes com.pucpr.game.server.local e com.pucpr.game.server.messages
     <i>*** O modo multiplayer pode não estar funcionando pois focamos na melhoria da fisica para a entrega dentro do prazo, como a entrega de multiplayer já ocorreu ficou sem prioridade ***</i>
 
