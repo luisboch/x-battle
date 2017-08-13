@@ -5,9 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -99,10 +97,10 @@ public class BasicGameScreen implements GameScreenState {
             service = new RemoteSevice(GameConfig.serverHost);
         }
 
-        player2.setPosition(new Vector2(300, 300));
         playerControl2 = service.insert(player2);
-        player.setPosition(new Vector2(400, 400));
+        player2.setPosition(new Vector2(2500, 2500));
         playerControl = service.insert(player);
+        player.setPosition(new Vector2(2000, 2000));
 
         for (int i = 1; i < 5; i++) {
             Planet p = new Planet();
@@ -121,9 +119,25 @@ public class BasicGameScreen implements GameScreenState {
     public void render() {
         calculate();
         long start = TimeUtils.nanoTime();
+////
+//        camera.position.x = player.getPosition().x;
+//        camera.position.y = player.getPosition().y;
 
-        camera.position.x = player.getPosition().x;
-        camera.position.y = player.getPosition().y;
+        Vector2 p2Pos = player2.getPosition().cpy();
+
+        // Cancula a distancia e pega a metade 
+        //**** no p2Pos vai ficar apenas o vetor resultante do calculo, ou seja modificado ****
+        float dist = p2Pos.sub(player.getPosition()).len() * 0.5f;
+        
+        // Vamos pegar a direcao e multiplicar pela metade da distancia.
+        p2Pos.nor().scl(dist);
+        
+        // Adicionamos o menor
+        p2Pos.add(player.getPosition());
+        
+        camera.position.x = p2Pos.x;
+        camera.position.y = p2Pos.y;
+//        
         camera.update();
         mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         mousePos = camera.unproject(mousePos);
@@ -175,7 +189,7 @@ public class BasicGameScreen implements GameScreenState {
         } else {
             playerControl.setUp(false);
         }
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             playerControl2.setUp(true);
         } else {
@@ -187,7 +201,7 @@ public class BasicGameScreen implements GameScreenState {
         } else {
             playerControl.setLeft(false);
         }
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             playerControl2.setLeft(true);
         } else {
@@ -199,7 +213,7 @@ public class BasicGameScreen implements GameScreenState {
         } else {
             playerControl.setRight(false);
         }
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             playerControl2.setRight(true);
         } else {
@@ -211,7 +225,7 @@ public class BasicGameScreen implements GameScreenState {
         } else {
             playerControl.setAction1(false);
         }
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)) {
             playerControl2.setAction1(true);
         } else {
@@ -223,7 +237,7 @@ public class BasicGameScreen implements GameScreenState {
         } else {
             playerControl.setAction2(false);
         }
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) {
             playerControl2.setAction2(true);
         } else {
@@ -235,7 +249,7 @@ public class BasicGameScreen implements GameScreenState {
         } else {
             playerControl.setAction3(false);
         }
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
             playerControl2.setAction3(true);
         } else {
