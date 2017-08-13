@@ -14,5 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
  */
 public interface GameScreenState extends AppState{
     void setStage(Stage stage);
+    @Override
     void close();
 }

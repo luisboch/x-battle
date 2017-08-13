@@ -32,9 +32,7 @@ public class ForceField extends ParticleEmitter {
     protected void tick() {
 
         super.tick();
-        System.out.println("BF: " + getDirection().x + ", " + getDirection().y);
         setDirection(getDirection().nor().rotate(50f * Gdx.graphics.getDeltaTime()));
-        System.out.println("AF: " + getDirection().x + ", " + getDirection().y);
         
         if (health < INIT_HEALTH) {
             health += (50 * Gdx.graphics.getDeltaTime());

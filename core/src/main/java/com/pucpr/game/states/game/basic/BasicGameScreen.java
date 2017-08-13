@@ -26,6 +26,7 @@ import com.pucpr.game.server.ActorControl;
 import com.pucpr.game.server.GameService;
 import com.pucpr.game.server.LocalhostService;
 import com.pucpr.game.server.RemoteSevice;
+import com.pucpr.game.states.FinishedState;
 import com.pucpr.game.states.GameScreenState;
 import com.pucpr.game.states.game.GameState;
 import com.pucpr.game.states.game.Planet;
@@ -61,10 +62,10 @@ public class BasicGameScreen implements GameScreenState {
     protected MapRenderer render;
     protected Vector3 mousePos = new Vector3();
 
-    protected Player player;
+    protected Player player1;
     protected Player player2;
-    protected ActorControl playerControl;
-    protected ActorControl playerControl2;
+    protected ActorControl player1Control;
+    protected ActorControl player2Control;
 
     protected List<Planet> planet = new ArrayList<Planet>();
 
@@ -79,7 +80,7 @@ public class BasicGameScreen implements GameScreenState {
         camera.position.x = 0;
         camera.position.y = 0;
 
-        player = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
+        player1 = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
         player2 = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
 
         render = new OrthogonalTiledMapRenderer(map, 1f / GameConfig.PPM);
@@ -97,10 +98,10 @@ public class BasicGameScreen implements GameScreenState {
             service = new RemoteSevice(GameConfig.serverHost);
         }
 
-        playerControl2 = service.insert(player2);
+        player2Control = service.insert(player2);
         player2.setPosition(new Vector2(2500, 2500));
-        playerControl = service.insert(player);
-        player.setPosition(new Vector2(2000, 2000));
+        player1Control = service.insert(player1);
+        player1.setPosition(new Vector2(2000, 2000));
 
         for (int i = 1; i < 5; i++) {
             Planet p = new Planet();
@@ -120,21 +121,21 @@ public class BasicGameScreen implements GameScreenState {
         calculate();
         long start = TimeUtils.nanoTime();
 ////
-//        camera.position.x = player.getPosition().x;
-//        camera.position.y = player.getPosition().y;
+//        camera.position.x = player1.getPosition().x;
+//        camera.position.y = player1.getPosition().y;
 
         Vector2 p2Pos = player2.getPosition().cpy();
 
         // Cancula a distancia e pega a metade 
         //**** no p2Pos vai ficar apenas o vetor resultante do calculo, ou seja modificado ****
-        float dist = p2Pos.sub(player.getPosition()).len() * 0.5f;
-        
+        float dist = p2Pos.sub(player1.getPosition()).len() * 0.5f;
+
         // Vamos pegar a direcao e multiplicar pela metade da distancia.
         p2Pos.nor().scl(dist);
-        
+
         // Adicionamos o menor
-        p2Pos.add(player.getPosition());
-        
+        p2Pos.add(player1.getPosition());
+
         camera.position.x = p2Pos.x;
         camera.position.y = p2Pos.y;
 //        
@@ -179,83 +180,88 @@ public class BasicGameScreen implements GameScreenState {
     private void calculate() {
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            playerControl.setForce(true);
+            player1Control.setForce(true);
         } else {
-            playerControl.setForce(false);
+            player1Control.setForce(false);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            playerControl.setUp(true);
+            player1Control.setUp(true);
         } else {
-            playerControl.setUp(false);
+            player1Control.setUp(false);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            playerControl2.setUp(true);
+            player2Control.setUp(true);
         } else {
-            playerControl2.setUp(false);
+            player2Control.setUp(false);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            playerControl.setLeft(true);
+            player1Control.setLeft(true);
         } else {
-            playerControl.setLeft(false);
+            player1Control.setLeft(false);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            playerControl2.setLeft(true);
+            player2Control.setLeft(true);
         } else {
-            playerControl2.setLeft(false);
+            player2Control.setLeft(false);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            playerControl.setRight(true);
+            player1Control.setRight(true);
         } else {
-            playerControl.setRight(false);
+            player1Control.setRight(false);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            playerControl2.setRight(true);
+            player2Control.setRight(true);
         } else {
-            playerControl2.setRight(false);
+            player2Control.setRight(false);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
-            playerControl.setAction1(true);
+        if (Gdx.input.isKeyPressed(Input.Keys.T)) {
+            player1Control.setAction1(true);
         } else {
-            playerControl.setAction1(false);
+            player1Control.setAction1(false);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)) {
-            playerControl2.setAction1(true);
+        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_1)) {
+            player2Control.setAction1(true);
         } else {
-            playerControl2.setAction1(false);
+            player2Control.setAction1(false);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-            playerControl.setAction2(true);
+        if (Gdx.input.isKeyPressed(Input.Keys.Y)) {
+            player1Control.setAction2(true);
         } else {
-            playerControl.setAction2(false);
+            player1Control.setAction2(false);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) {
-            playerControl2.setAction2(true);
+        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_2)) {
+            player2Control.setAction2(true);
         } else {
-            playerControl2.setAction2(false);
+            player2Control.setAction2(false);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-            playerControl.setAction3(true);
+        if (Gdx.input.isKeyPressed(Input.Keys.U)) {
+            player1Control.setAction3(true);
         } else {
-            playerControl.setAction3(false);
+            player1Control.setAction3(false);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
-            playerControl2.setAction3(true);
+        if (Gdx.input.isKeyPressed(Input.Keys.NUMPAD_3)) {
+            player2Control.setAction3(true);
         } else {
-            playerControl2.setAction3(false);
+            player2Control.setAction3(false);
         }
 
+        if (player1.getHealthPercent() <= 0f) {
+            manager.setState(new FinishedState("2"));
+        } else if (player2.getHealthPercent() <= 0f) {
+            manager.setState(new FinishedState("1"));
+        }
     }
 
     public void setGameState(GameState gameState) {
