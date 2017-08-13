@@ -64,8 +64,9 @@ public class BasicGameScreen implements GameScreenState {
     protected Vector3 mousePos = new Vector3();
 
     protected Player player;
-//    protected Player player2;
+    protected Player player2;
     protected ActorControl playerControl;
+    protected ActorControl playerControl2;
 
     protected List<Planet> planet = new ArrayList<Planet>();
 
@@ -81,7 +82,7 @@ public class BasicGameScreen implements GameScreenState {
         camera.position.y = 0;
 
         player = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
-//        player2 = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
+        player2 = Aircrafts.getNewPlayer(PlayerStatus.getInstance().intKey(Keys.AIRCRAFT));
 
         render = new OrthogonalTiledMapRenderer(map, 1f / GameConfig.PPM);
         // next we setup the immediate mode renderer
@@ -98,8 +99,8 @@ public class BasicGameScreen implements GameScreenState {
             service = new RemoteSevice(GameConfig.serverHost);
         }
 
-//        player2.setPosition(new Vector2(300, 300));
-//        playerControl = service.insert(player2);
+        player2.setPosition(new Vector2(300, 300));
+        playerControl2 = service.insert(player2);
         player.setPosition(new Vector2(400, 400));
         playerControl = service.insert(player);
 
@@ -169,40 +170,76 @@ public class BasicGameScreen implements GameScreenState {
             playerControl.setForce(false);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             playerControl.setUp(true);
         } else {
             playerControl.setUp(false);
         }
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            playerControl2.setUp(true);
+        } else {
+            playerControl2.setUp(false);
+        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             playerControl.setLeft(true);
         } else {
             playerControl.setLeft(false);
         }
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            playerControl2.setLeft(true);
+        } else {
+            playerControl2.setLeft(false);
+        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             playerControl.setRight(true);
         } else {
             playerControl.setRight(false);
         }
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            playerControl2.setRight(true);
+        } else {
+            playerControl2.setRight(false);
+        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
             playerControl.setAction1(true);
         } else {
             playerControl.setAction1(false);
         }
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)) {
+            playerControl2.setAction1(true);
+        } else {
+            playerControl2.setAction1(false);
+        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
             playerControl.setAction2(true);
         } else {
             playerControl.setAction2(false);
         }
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) {
+            playerControl2.setAction2(true);
+        } else {
+            playerControl2.setAction2(false);
+        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
             playerControl.setAction3(true);
         } else {
             playerControl.setAction3(false);
+        }
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
+            playerControl2.setAction3(true);
+        } else {
+            playerControl2.setAction3(false);
         }
 
     }
